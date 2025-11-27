@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: vehicle-renting
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  web:
+    error:
+      include-message: always
+      include-stacktrace: never
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+
