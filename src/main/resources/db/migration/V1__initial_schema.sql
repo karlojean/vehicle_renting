@@ -13,7 +13,7 @@ CREATE TABLE account
     email           VARCHAR(100) UNIQUE NOT NULL,
     phone_number    VARCHAR(15),
     password        VARCHAR(255)        NOT NULL,
-    role            VARCHAR(20),
+    role            VARCHAR(20) NOT NULL,
     profile_picture BIGINT UNIQUE,
     CONSTRAINT fk_profile_picture FOREIGN KEY (profile_picture) REFERENCES image (id)
 );

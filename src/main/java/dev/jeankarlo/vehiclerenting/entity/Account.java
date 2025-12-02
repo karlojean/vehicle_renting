@@ -1,5 +1,6 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
+import dev.jeankarlo.vehiclerenting.entity.enums.AccountRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +27,9 @@ public class Account {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role", length = 20)
-    private String role;
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountRole role;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_picture")
