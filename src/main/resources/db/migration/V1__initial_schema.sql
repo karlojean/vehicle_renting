@@ -14,7 +14,7 @@ CREATE TABLE account
     phone_number    VARCHAR(15),
     password        VARCHAR(255)        NOT NULL,
     role            VARCHAR(20),
-    profile_picture BIGINT,
+    profile_picture BIGINT UNIQUE,
     CONSTRAINT fk_profile_picture FOREIGN KEY (profile_picture) REFERENCES image (id)
 );
 
