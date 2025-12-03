@@ -4,9 +4,12 @@ import dev.jeankarlo.vehiclerenting.dto.account.AccountCreateDTO;
 import dev.jeankarlo.vehiclerenting.dto.account.AccountResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
+
+    @Mapping(target = "password", ignore = true)
     Account toEntity(AccountCreateDTO dto);
     AccountResponseDTO toResponseDTO(Account account);
 }
