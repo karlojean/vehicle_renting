@@ -21,3 +21,5 @@ logging:
   level:
     root: info
     org.flywaydb: DEBUG
+
+jwt.secret: ${JWT_SECRET:mydevsecretkey}

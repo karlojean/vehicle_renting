@@ -3,7 +3,7 @@ package dev.jeankarlo.vehiclerenting.dto.auth;
 import dev.jeankarlo.vehiclerenting.dto.account.AccountCreateDTO;
 import dev.jeankarlo.vehiclerenting.entity.enums.AccountRole;
 
-public record RegisterDTO(
+public record RegisterRequestDTO(
     String username,
     String email,
     String password,

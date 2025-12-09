@@ -39,4 +39,11 @@ public class AccountServiceImpl implements AccountService {
 
         return accountMapper.toResponseDTO(account);
     }
+
+    public AccountResponseDTO getByUsername(String username) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        return accountMapper.toResponseDTO(account);
+    }
 }
