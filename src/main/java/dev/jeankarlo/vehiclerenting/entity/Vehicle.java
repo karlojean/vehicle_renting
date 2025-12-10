@@ -29,4 +29,8 @@ public class Vehicle {
     @Column(name = "fuel_type", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private VehicleFuelType fuelType;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Account owner;
 }

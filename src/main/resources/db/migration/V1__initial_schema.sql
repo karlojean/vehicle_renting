@@ -24,7 +24,10 @@ CREATE TABLE vehicle
     brand     VARCHAR(50) NOT NULL,
     type      VARCHAR(50) NOT NULL,
     model     VARCHAR(50) NOT NULL,
-    fuel_type VARCHAR(50) NOT NULL
+    fuel_type VARCHAR(50) NOT NULL,
+    owner_id  BIGINT     NOT NULL,
+
+    CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES account (id)
 );
 
 
