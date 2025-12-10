@@ -1,5 +1,7 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
+import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
+import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +20,13 @@ public class Vehicle {
     private String brand;
 
     @Column(name = "type", nullable = false, length = 50)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private VehicleType type;
 
     @Column(name = "model", nullable = false, length = 50)
     private String model;
 
     @Column(name = "fuel_type", nullable = false, length = 50)
-    private String fuelType;
-
+    @Enumerated(EnumType.STRING)
+    private VehicleFuelType fuelType;
 }

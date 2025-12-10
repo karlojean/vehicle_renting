@@ -23,7 +23,6 @@ public class AccountController {
     public ResponseEntity<AccountResponseDTO> getCurrentAccount(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        System.out.println("userDetails = " + userDetails);
         return ResponseEntity.ok(accountService.getByUsername(userDetails.getUsername()));
     }
 }

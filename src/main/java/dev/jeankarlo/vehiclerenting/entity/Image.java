@@ -14,8 +14,8 @@ public class Image {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "contenttype", nullable = false, length = 50)
-    private String contenttype;
+    @Column(name = "content_type", nullable = false, length = 50)
+    private String contentType;
 
     @Column(name = "image_bytes", nullable = false)
     private byte[] imageBytes;

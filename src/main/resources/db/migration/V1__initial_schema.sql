@@ -1,7 +1,7 @@
 CREATE TABLE image
 (
     id          BIGSERIAL PRIMARY KEY,
-    contentType VARCHAR(50) NOT NULL,
+    content_type VARCHAR(50) NOT NULL,
     image_bytes BYTEA       NOT NULL
 );
 
@@ -17,8 +17,6 @@ CREATE TABLE account
     profile_picture BIGINT UNIQUE,
     CONSTRAINT fk_profile_picture FOREIGN KEY (profile_picture) REFERENCES image (id)
 );
-
-
 
 CREATE TABLE vehicle
 (
@@ -39,7 +37,6 @@ CREATE TABLE vehicle_image
     CONSTRAINT fk_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id),
     CONSTRAINT fk_image FOREIGN KEY (image_id) REFERENCES image (id)
 );
-
 
 
 CREATE TABLE vehicle_listing
