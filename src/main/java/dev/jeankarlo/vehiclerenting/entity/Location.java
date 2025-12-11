@@ -1,6 +1,8 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,28 +16,29 @@ public class Location {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "address_line", nullable = false, length = Integer.MAX_VALUE)
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "address_line", nullable = false)
     private String addressLine;
 
-    @Column(name = "address_line_optional", length = Integer.MAX_VALUE)
-    private String addressLineOptional;
-
-    @Column(name = "area", nullable = false, length = 100)
-    private String area;
-
+    @Size(max = 50)
+    @NotNull
     @Column(name = "city", nullable = false, length = 50)
     private String city;
 
+    @Size(max = 50)
+    @NotNull
     @Column(name = "state", nullable = false, length = 50)
     private String state;
 
+    @Size(max = 10)
+    @NotNull
     @Column(name = "pin_code", nullable = false, length = 10)
     private String pinCode;
 
+    @Size(max = 50)
+    @NotNull
     @Column(name = "country", nullable = false, length = 50)
     private String country;
-
-    @Column(name = "phone_number", length = 15)
-    private String phoneNumber;
 
 }

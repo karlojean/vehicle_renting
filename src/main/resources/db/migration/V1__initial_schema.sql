@@ -1,14 +1,11 @@
 CREATE TABLE location
 (
     id                    BIGSERIAL PRIMARY KEY,
-    address_line          TEXT         NOT NULL,
-    address_line_optional TEXT,
-    area                  VARCHAR(100) NOT NULL,
+    address_line          VARCHAR(255)         NOT NULL,
     city                  VARCHAR(50)  NOT NULL,
     state                 VARCHAR(50)  NOT NULL,
     pin_code              VARCHAR(10)  NOT NULL,
-    country               VARCHAR(50)  NOT NULL,
-    phone_number          VARCHAR(15)
+    country               VARCHAR(50)  NOT NULL
 );
 
 CREATE TABLE image
