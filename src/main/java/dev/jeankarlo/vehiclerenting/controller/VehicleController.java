@@ -78,4 +78,24 @@ public class VehicleController {
         Long ownerId = account.getId();
         return ResponseEntity.ok(vehicleService.updateById(id, ownerId, vehiclePatchDTO));
     }
+
+    @PatchMapping("/{id}/deactivate")
+    public  ResponseEntity<Void>  deactivate(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account
+    ) {
+        Long ownerId = account.getId();
+        vehicleService.deactivate(id, ownerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activate")
+    public  ResponseEntity<Void>  activate(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account
+    ) {
+        Long ownerId = account.getId();
+        vehicleService.activate(id, ownerId);
+        return ResponseEntity.noContent().build();
+    }
 }

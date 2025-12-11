@@ -60,8 +60,21 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
     }
 
+    public void deactivate(Long id, Long ownerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+        vehicle.setIsActive(false);
+        vehicleRepository.save(vehicle);
+    }
+
+    public void activate(Long id, Long ownerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+        vehicle.setIsActive(true);
+        vehicleRepository.save(vehicle);
+    }
+
     private Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
         return vehicleRepository.findByIdAndOwner_Id(id, ownerId)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
+
 }

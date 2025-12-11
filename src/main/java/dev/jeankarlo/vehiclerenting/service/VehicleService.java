@@ -15,4 +15,6 @@ public interface VehicleService {
     List<VehicleResponseDTO> getAll(Long ownerId, Pageable pageable);
     void deleteById(Long id, Long ownerId);
     VehicleResponseDTO updateById(Long id, Long ownerId, VehiclePatchDTO vehiclePatchDTO);
+    void deactivate(Long id, Long ownerId);
+    void activate(Long id, Long ownerId);
 }
