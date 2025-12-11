@@ -25,7 +25,7 @@ public class Review {
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "vehicle_listing_id", nullable = false)
-    private VehicleListing vehicleListing;
+    @JoinColumn(name = "listing_id", nullable = false)
+    private Listing listing;
 
 }

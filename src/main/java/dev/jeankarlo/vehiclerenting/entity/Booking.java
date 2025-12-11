@@ -29,8 +29,8 @@ public class Booking {
     private Integer duration;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "vehicle_id", nullable = false)
-    private VehicleListing vehicle;
+    @JoinColumn(name = "listing_id", nullable = false)
+    private Listing listing;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "account_id", nullable = false)
