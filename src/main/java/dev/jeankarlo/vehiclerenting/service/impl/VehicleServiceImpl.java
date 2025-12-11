@@ -32,6 +32,7 @@ public class VehicleServiceImpl implements VehicleService {
         Account account = accountService.getEntityById(ownerId);
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
         vehicle.setOwner(account);
+        vehicle.setIsActive(true);
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
     }
 

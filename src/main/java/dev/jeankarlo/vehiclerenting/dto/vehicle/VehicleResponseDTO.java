@@ -6,7 +6,10 @@ import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
 public record VehicleResponseDTO (
         Long id,
         String brand,
-        VehicleType type,
         String model,
-        VehicleFuelType fuelType
+        VehicleFuelType fuelType,
+        VehicleType vehicleType,
+        Integer yearManufactured,
+        String licensePlate,
+        String color
 ) {}

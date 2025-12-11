@@ -4,18 +4,28 @@ import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record VehicleCreateDTO(
         @NotEmpty
         String brand,
 
-        @NotNull
-        VehicleType type,
-
         @NotEmpty
         String model,
 
         @NotNull
-        VehicleFuelType fuelType
+        VehicleFuelType fuelType,
+
+        @NotNull
+        VehicleType vehicleType,
+
+        @NotNull
+        Integer yearManufactured,
+
+        @NotNull
+        String licensePlate,
+
+        @Size(max = 30)
+        String color
 ) {
 }

@@ -15,6 +15,7 @@ CREATE TABLE account
     password        VARCHAR(255)        NOT NULL,
     role            VARCHAR(20) NOT NULL,
     profile_picture BIGINT UNIQUE,
+
     CONSTRAINT fk_profile_picture FOREIGN KEY (profile_picture) REFERENCES image (id)
 );
 
@@ -22,10 +23,15 @@ CREATE TABLE vehicle
 (
     id        BIGSERIAL PRIMARY KEY,
     brand     VARCHAR(50) NOT NULL,
-    type      VARCHAR(50) NOT NULL,
     model     VARCHAR(50) NOT NULL,
-    fuel_type VARCHAR(50) NOT NULL,
+    fuel_type VARCHAR(20) NOT NULL CHECK (fuel_type IN ('PETROL', 'DIESEL', 'ETHANOL', 'ELECTRIC', 'HYBRID')),
+    vehicle_type VARCHAR(20) NOT NULL CHECK (vehicle_type IN ('HATCHBACK', 'SEDAN', 'SUV', 'PICKUP', 'VAN', 'MOTORCYCLE')),
     owner_id  BIGINT     NOT NULL,
+    year_manufactured INT        NOT NULL,
+    license_plate VARCHAR(20) NOT NULL UNIQUE,
+    color     VARCHAR(30),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES account (id)
 );

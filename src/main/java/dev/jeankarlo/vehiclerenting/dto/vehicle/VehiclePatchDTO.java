@@ -2,13 +2,16 @@ package dev.jeankarlo.vehiclerenting.dto.vehicle;
 
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record VehiclePatchDTO(
         String brand,
-        VehicleType type,
         String model,
-        VehicleFuelType fuelType
+        VehicleFuelType fuelType,
+        VehicleType vehicleType,
+        Integer yearManufactured,
+        String licensePlate,
+        @Size(max = 30)
+        String color
 ) {
 }
