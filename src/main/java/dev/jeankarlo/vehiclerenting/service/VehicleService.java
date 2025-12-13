@@ -1,11 +1,13 @@
 package dev.jeankarlo.vehiclerenting.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleCreateDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 
 public interface VehicleService {
     VehicleResponseDTO create(Long id, VehicleCreateDTO vehicleCreateDTO);
@@ -21,4 +23,6 @@ public interface VehicleService {
     void deactivate(Long id, Long ownerId);
 
     void activate(Long id, Long ownerId);
+
+    Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId);
 }

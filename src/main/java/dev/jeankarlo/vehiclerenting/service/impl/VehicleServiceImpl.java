@@ -80,7 +80,8 @@ public class VehicleServiceImpl implements VehicleService {
         vehicleRepository.save(vehicle);
     }
 
-    private Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
+    @Override
+    public Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
         return vehicleRepository.findByIdAndOwner_Id(id, ownerId)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
