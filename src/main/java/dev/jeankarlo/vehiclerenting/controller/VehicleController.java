@@ -4,10 +4,8 @@ import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleCreateDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
-import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,8 +31,7 @@ public class VehicleController {
     @ResponseStatus(HttpStatus.CREATED)
     public VehicleResponseDTO create(
             @RequestBody @Valid VehicleCreateDTO createVehicleDTO,
-            @AuthenticationPrincipal Account account
-    ) {
+            @AuthenticationPrincipal Account account) {
         Long userId = account.getId();
         return vehicleService.create(userId, createVehicleDTO);
     }
@@ -42,8 +39,7 @@ public class VehicleController {
     @GetMapping("/{id}")
     public ResponseEntity<VehicleResponseDTO> getById(
             @PathVariable Long id,
-            @AuthenticationPrincipal Account account
-    ){
+            @AuthenticationPrincipal Account account) {
         Long userId = account.getId();
         return ResponseEntity.ok(vehicleService.getById(userId, id));
     }
@@ -51,9 +47,8 @@ public class VehicleController {
     @GetMapping
     public ResponseEntity<List<VehicleResponseDTO>> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue =  "10") int size,
-            @AuthenticationPrincipal Account account
-    ){
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal Account account) {
         Long userId = account.getId();
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(vehicleService.getAll(userId, pageable));
@@ -62,8 +57,7 @@ public class VehicleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(
             @PathVariable Long id,
-            @AuthenticationPrincipal Account account
-    ){
+            @AuthenticationPrincipal Account account) {
         Long userId = account.getId();
         vehicleService.deleteById(id, userId);
         return ResponseEntity.noContent().build();
@@ -73,27 +67,24 @@ public class VehicleController {
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
             @PathVariable Long id,
             @RequestBody @Valid VehiclePatchDTO vehiclePatchDTO,
-            @AuthenticationPrincipal Account account
-    ) {
+            @AuthenticationPrincipal Account account) {
         Long ownerId = account.getId();
         return ResponseEntity.ok(vehicleService.updateById(id, ownerId, vehiclePatchDTO));
     }
 
     @PatchMapping("/{id}/deactivate")
-    public  ResponseEntity<Void>  deactivate(
+    public ResponseEntity<Void> deactivate(
             @PathVariable Long id,
-            @AuthenticationPrincipal Account account
-    ) {
+            @AuthenticationPrincipal Account account) {
         Long ownerId = account.getId();
         vehicleService.deactivate(id, ownerId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/activate")
-    public  ResponseEntity<Void>  activate(
+    public ResponseEntity<Void> activate(
             @PathVariable Long id,
-            @AuthenticationPrincipal Account account
-    ) {
+            @AuthenticationPrincipal Account account) {
         Long ownerId = account.getId();
         vehicleService.activate(id, ownerId);
         return ResponseEntity.noContent().build();

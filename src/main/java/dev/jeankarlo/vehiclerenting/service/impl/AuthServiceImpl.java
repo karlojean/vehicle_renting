@@ -6,7 +6,6 @@ import dev.jeankarlo.vehiclerenting.dto.auth.LoginRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.auth.RegisterRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.auth.TokenResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
-import dev.jeankarlo.vehiclerenting.repository.AccountRepository;
 import dev.jeankarlo.vehiclerenting.service.AccountService;
 import dev.jeankarlo.vehiclerenting.service.AuthService;
 import dev.jeankarlo.vehiclerenting.utils.JwtTokenUtil;
@@ -21,17 +20,17 @@ import java.util.Locale;
 public class AuthServiceImpl implements AuthService {
 
     private final AccountService accountService;
-    private final AccountRepository accountRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public AuthServiceImpl(AccountService accountService, AccountRepository accountRepository, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
+    public AuthServiceImpl(AccountService accountService,
+            AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
         this.accountService = accountService;
-        this.accountRepository = accountRepository;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
+    @Override
     public AccountResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         AccountCreateDTO accountCreateDTO = registerRequestDTO.toAccountCreateDTO();
 
@@ -42,12 +41,12 @@ public class AuthServiceImpl implements AuthService {
         return account;
     }
 
+    @Override
     public TokenResponseDTO login(LoginRequestDTO loginRequestDTO) {
         String email = normalizeEmail(loginRequestDTO.email());
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, loginRequestDTO.password())
-        );
+                new UsernamePasswordAuthenticationToken(email, loginRequestDTO.password()));
 
         Account accountPrincipal = (Account) authentication.getPrincipal();
         String jwt = jwtTokenUtil.generateToken(accountPrincipal);
@@ -57,7 +56,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String normalizeEmail(String email) {
-        if (email == null) return null;
+        if (email == null)
+            return null;
         return email.trim().toLowerCase(Locale.ROOT);
     }
 }

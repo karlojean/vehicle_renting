@@ -22,12 +22,14 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final AccountService accountService;
 
-    public VehicleServiceImpl(VehicleMapper vehicleMapper, VehicleRepository vehicleRepository, AccountService accountService) {
+    public VehicleServiceImpl(VehicleMapper vehicleMapper, VehicleRepository vehicleRepository,
+            AccountService accountService) {
         this.vehicleMapper = vehicleMapper;
         this.vehicleRepository = vehicleRepository;
         this.accountService = accountService;
     }
 
+    @Override
     public VehicleResponseDTO create(Long ownerId, VehicleCreateDTO vehicleCreateDTO) {
         Account account = accountService.getEntityById(ownerId);
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
@@ -36,22 +38,26 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
     }
 
+    @Override
     public VehicleResponseDTO getById(Long ownerId, Long id) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
         return vehicleMapper.toResponseDTO(vehicle);
     }
 
+    @Override
     public List<VehicleResponseDTO> getAll(Long ownerId, Pageable pageable) {
         Account account = accountService.getEntityById(ownerId);
         Page<Vehicle> vehicles = vehicleRepository.findByOwner(account, pageable);
         return vehicles.map(vehicleMapper::toResponseDTO).toList();
     }
 
+    @Override
     public void deleteById(Long id, Long ownerId) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
         vehicleRepository.delete(vehicle);
     }
 
+    @Override
     public VehicleResponseDTO updateById(Long id, Long ownerId, VehiclePatchDTO vehiclePatchDTO) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
 
@@ -60,12 +66,14 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
     }
 
+    @Override
     public void deactivate(Long id, Long ownerId) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
         vehicle.setIsActive(false);
         vehicleRepository.save(vehicle);
     }
 
+    @Override
     public void activate(Long id, Long ownerId) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
         vehicle.setIsActive(true);
