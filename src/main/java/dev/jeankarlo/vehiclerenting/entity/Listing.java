@@ -41,15 +41,15 @@ public class Listing {
     @NotNull
     @ColumnDefault("true")
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = false;
+    private Boolean isActive = true;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", nullable = false, referencedColumnName = "id")
     private Location location;
 
