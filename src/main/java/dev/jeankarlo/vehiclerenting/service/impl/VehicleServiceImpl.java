@@ -1,7 +1,13 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
-import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleCreateDTO;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
@@ -9,11 +15,6 @@ import dev.jeankarlo.vehiclerenting.mapper.VehicleMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
 import dev.jeankarlo.vehiclerenting.service.AccountService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -30,7 +31,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public VehicleResponseDTO create(Long ownerId, VehicleCreateDTO vehicleCreateDTO) {
+    public VehicleResponseDTO create(Long ownerId, VehicleRequestDTO vehicleCreateDTO) {
         Account account = accountService.getEntityById(ownerId);
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
         vehicle.setOwner(account);

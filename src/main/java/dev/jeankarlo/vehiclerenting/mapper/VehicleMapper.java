@@ -1,13 +1,14 @@
 package dev.jeankarlo.vehiclerenting.mapper;
 
-import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleCreateDTO;
-import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
-import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
-import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
+import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 
 @Mapper(componentModel = "spring")
 public interface VehicleMapper {
@@ -16,7 +17,7 @@ public interface VehicleMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    Vehicle toEntity(VehicleCreateDTO dto);
+    Vehicle toEntity(VehicleRequestDTO dto);
 
     VehicleResponseDTO toResponseDTO(Vehicle vehicle);
 
