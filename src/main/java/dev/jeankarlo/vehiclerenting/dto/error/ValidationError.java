@@ -12,9 +12,11 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 public class ValidationError extends ApiError {
-  private List<FieldMessage> fieldMessages = new ArrayList<>();
 
-  public void addError(String fieldName, String message) {
-    fieldMessages.add(new FieldMessage(fieldName, message));
-  }
+    @Builder.Default
+    private List<FieldMessage> fieldMessages = new ArrayList<>();
+
+    public void addError(String fieldName, String message) {
+        fieldMessages.add(new FieldMessage(fieldName, message));
+    }
 }
