@@ -1,5 +1,6 @@
 package dev.jeankarlo.vehiclerenting.dto.vehicle;
 
+import dev.jeankarlo.vehiclerenting.dto.location.LocationResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
 
@@ -14,6 +15,9 @@ public record VehicleResponseDTO (
         Integer yearManufactured,
         String licensePlate,
         String color,
+        Long pricePerDayCents,
+        String description,
+        LocationResponseDTO location,
         boolean isActive,
         Instant createdAt
 ) {}

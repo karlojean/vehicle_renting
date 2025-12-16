@@ -5,5 +5,8 @@ public record LocationResponseDTO(
     String city,
     String state,
     String pinCode,
-    String country) {
+    String country,
+    Double latitude,
+    Double longitude
+) {
 }

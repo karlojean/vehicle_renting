@@ -10,6 +10,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 
 @Getter
@@ -50,6 +52,19 @@ public class Vehicle {
     @Column(name = "color", length = 30)
     private String color;
 
+    @NotNull
+    @Column(name = "price_per_day_cents", nullable = false)
+    private Long pricePerDayCents;
+
+    @NotNull
+    @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
+    private String description;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
+
     @ColumnDefault("true")
     @Column(name = "is_active")
     private Boolean isActive;
@@ -57,7 +72,6 @@ public class Vehicle {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
     private Account owner;
-
 
     @Column(name = "created_at")
     @CreationTimestamp

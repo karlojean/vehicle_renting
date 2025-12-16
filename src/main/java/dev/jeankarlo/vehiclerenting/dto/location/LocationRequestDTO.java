@@ -22,6 +22,10 @@ public record LocationRequestDTO(
 
         @NotEmpty
         @Size(max = 50)
-        String country
+        String country,
+
+        Double latitude,
+
+        Double longitude
 ) {
 }

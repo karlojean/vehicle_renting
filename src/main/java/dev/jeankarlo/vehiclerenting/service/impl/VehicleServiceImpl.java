@@ -2,6 +2,8 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 
 import java.util.List;
 
+import dev.jeankarlo.vehiclerenting.entity.Location;
+import dev.jeankarlo.vehiclerenting.service.LocationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,19 +24,24 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleMapper vehicleMapper;
     private final VehicleRepository vehicleRepository;
     private final AccountService accountService;
+    private final LocationService locationService;
 
     public VehicleServiceImpl(VehicleMapper vehicleMapper, VehicleRepository vehicleRepository,
-            AccountService accountService) {
+                              AccountService accountService, LocationService locationService) {
         this.vehicleMapper = vehicleMapper;
         this.vehicleRepository = vehicleRepository;
         this.accountService = accountService;
+        this.locationService = locationService;
     }
 
     @Override
     public VehicleResponseDTO create(Long ownerId, VehicleRequestDTO vehicleCreateDTO) {
         Account account = accountService.getEntityById(ownerId);
+        Location location = locationService.getEntityById(vehicleCreateDTO.locationId());
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
+
         vehicle.setOwner(account);
+        vehicle.setLocation(location);
         vehicle.setIsActive(true);
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
     }
