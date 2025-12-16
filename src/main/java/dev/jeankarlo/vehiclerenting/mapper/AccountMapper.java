@@ -11,7 +11,6 @@ public interface AccountMapper {
 
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "profilePicture", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     Account toEntity(AccountCreateDTO dto);
 

@@ -37,10 +37,6 @@ public class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountRole role;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_picture")
-    private Image profilePicture;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
