@@ -103,7 +103,7 @@ public class VehicleController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/image")
+    @PostMapping("/{id}/images")
     public ResponseEntity<Void> uploadVehicleImage(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
@@ -112,7 +112,7 @@ public class VehicleController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/image")
+    @GetMapping("/{id}/images")
     public ResponseEntity<List<VehicleImageResponseDTO>> getVehicleImage(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
