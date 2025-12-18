@@ -45,3 +45,12 @@ CREATE TABLE vehicle
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location (id)
 );
 
+CREATE TABLE vehicle_image
+(
+    id         BIGSERIAL PRIMARY KEY,
+    vehicle_id BIGINT    NOT NULL,
+    url  VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE
+);
+

@@ -2,9 +2,11 @@ package dev.jeankarlo.vehiclerenting.controller;
 
 import java.util.List;
 
+import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,7 @@ import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -98,5 +101,22 @@ public class VehicleController {
         Long ownerId = account.getId();
         vehicleService.activate(id, ownerId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/image")
+    public ResponseEntity<Void> uploadVehicleImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal Account account) {
+        vehicleService.uploadVehicleImage(id, account.getId(), file);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<List<VehicleImageResponseDTO>> getVehicleImage(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account) {
+        Long ownerId = account.getId();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleService.getVehicleImages(id, ownerId));
     }
 }
