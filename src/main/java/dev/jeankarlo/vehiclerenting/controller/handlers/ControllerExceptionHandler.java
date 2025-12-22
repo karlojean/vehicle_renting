@@ -2,6 +2,7 @@ package dev.jeankarlo.vehiclerenting.controller.handlers;
 
 import java.time.Instant;
 
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,10 @@ import jakarta.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiError> handleGenericException(Exception ex, HttpServletRequest request) {
-      return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno inesperado", request);
-  }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGenericException(Exception ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno inesperado", request);
+    }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> database(DataIntegrityViolationException e, HttpServletRequest request) {
@@ -34,25 +35,30 @@ public class ControllerExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "JSON inválido ou formato incorreto", request);
     }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
-    String error = "Validation error";
-    HttpStatus status = HttpStatus.UNPROCESSABLE_CONTENT;
-
-    ValidationError err = ValidationError.builder()
-            .timestamp(Instant.now())
-            .status(status.value())
-            .error(error)
-            .message("Erro na validação dos campos")
-            .path(request.getRequestURI())
-            .build();
-
-    for (FieldError f : e.getBindingResult().getFieldErrors()) {
-      err.addError(f.getField(), f.getDefaultMessage());
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiError> businessError(BusinessException e, HttpServletRequest request) {
+        return buildErrorResponse(e.getHttpStatus(), e.getMessage(), request);
     }
 
-    return ResponseEntity.status(status).body(err);
-  }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String error = "Validation error";
+        HttpStatus status = HttpStatus.UNPROCESSABLE_CONTENT;
+
+        ValidationError err = ValidationError.builder()
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error(error)
+                .message("Erro na validação dos campos")
+                .path(request.getRequestURI())
+                .build();
+
+        for (FieldError f : e.getBindingResult().getFieldErrors()) {
+            err.addError(f.getField(), f.getDefaultMessage());
+        }
+
+        return ResponseEntity.status(status).body(err);
+    }
 
     private ResponseEntity<ApiError> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {
         ApiError error = ApiError.builder()
@@ -65,7 +71,6 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(error);
     }
-
 
 
 }

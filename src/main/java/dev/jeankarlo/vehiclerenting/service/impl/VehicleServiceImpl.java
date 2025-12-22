@@ -1,17 +1,19 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
-import java.net.URL;
 import java.util.List;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Location;
 import dev.jeankarlo.vehiclerenting.entity.VehicleImage;
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.VehicleImageMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleImageRepository;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.LocationService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
@@ -48,6 +50,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @Transactional
     public VehicleResponseDTO create(Long ownerId, VehicleRequestDTO vehicleCreateDTO) {
         Account account = accountService.getEntityById(ownerId);
         Location location = locationService.getEntityById(vehicleCreateDTO.locationId());
@@ -104,7 +107,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
         return vehicleRepository.findByIdAndOwner_Id(id, ownerId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+                .orElseThrow(() -> new BusinessException("Veiculo não encontrado ou não pertence ao usuário.", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -132,6 +135,6 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Vehicle getEntityById(Long vehicleId) {
         return vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+                .orElseThrow(() -> new BusinessException("Veiculo com o ID: " + vehicleId + " não encontrado.", HttpStatus.NOT_FOUND));
     }
 }

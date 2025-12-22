@@ -1,7 +1,9 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -38,7 +40,7 @@ public class S3FileStorageServiceImpl implements FileStorageService {
         try {
             s3Client.putObject(putObj, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException("Erro ao fazer upload do arquivo: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         URL url = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(keyName));

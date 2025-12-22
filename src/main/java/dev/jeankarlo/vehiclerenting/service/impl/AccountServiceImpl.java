@@ -3,9 +3,11 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 import dev.jeankarlo.vehiclerenting.dto.account.AccountCreateDTO;
 import dev.jeankarlo.vehiclerenting.dto.account.AccountResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.AccountMapper;
 import dev.jeankarlo.vehiclerenting.repository.AccountRepository;
 import dev.jeankarlo.vehiclerenting.service.AccountService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,7 @@ public class AccountServiceImpl implements AccountService {
 
     public AccountResponseDTO create(AccountCreateDTO accountCreateDTO) {
         if(accountRepository.existsByEmail((accountCreateDTO.email()))) {
-            throw new RuntimeException("Account with this email already exists");
+            throw new BusinessException("Já existe uma conta utilizando este email", HttpStatus.CONFLICT);
         }
 
         Account account = accountMapper.toEntity(accountCreateDTO);
@@ -34,21 +36,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public AccountResponseDTO getById(Long id) {
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Account account = getEntityById(id);
 
         return accountMapper.toResponseDTO(account);
     }
 
     public AccountResponseDTO getByUsername(String username) {
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new BusinessException("Conta não encontrada", HttpStatus.NOT_FOUND));
 
         return accountMapper.toResponseDTO(account);
     }
 
     public Account getEntityById(Long id) {
         return accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new BusinessException("Conta não encontrada", HttpStatus.NOT_FOUND));
     }
 }

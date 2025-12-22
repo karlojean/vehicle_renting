@@ -5,6 +5,8 @@ import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
+import dev.jeankarlo.vehiclerenting.exception.InvalidDataRangeException;
+import dev.jeankarlo.vehiclerenting.exception.VehicleUnavailableException;
 import dev.jeankarlo.vehiclerenting.mapper.BookingMapper;
 import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
 import dev.jeankarlo.vehiclerenting.service.AccountService;
@@ -37,18 +39,18 @@ public class BookingServiceImpl implements BookingService {
         Vehicle vehicle = vehicleService.getEntityById(bookingRequestDTO.vehicleId());
 
         if (bookingRequestDTO.endDate().isBefore(bookingRequestDTO.startDate())) {
-            throw new IllegalArgumentException("A data de término deve ser posterior à data de início.");
+            throw new InvalidDataRangeException("A data de término deve ser posterior à data de início.");
         }
 
         if (bookingRequestDTO.startDate().equals(bookingRequestDTO.endDate())) {
-            throw new IllegalArgumentException("A data de término deve ser diferente da data de início.");
+            throw new InvalidDataRangeException("A data de término deve ser diferente da data de início.");
         }
 
         if(bookingRepository.existsOverlap(
                 bookingRequestDTO.vehicleId(),
                 bookingRequestDTO.startDate(),
                 bookingRequestDTO.endDate())) {
-            throw new IllegalArgumentException("O veiculo já está reservado para o período selecionado.");
+            throw new VehicleUnavailableException();
         }
 
         Long rentalDays = ChronoUnit.DAYS.between(bookingRequestDTO.startDate(), bookingRequestDTO.endDate());
