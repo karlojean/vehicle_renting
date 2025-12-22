@@ -128,4 +128,10 @@ public class VehicleServiceImpl implements VehicleService {
 
         return vehicleImages.stream().map(vehicleImageMapper::toResponseDTO).toList();
     }
+
+    @Override
+    public Vehicle getEntityById(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+    }
 }

@@ -3,6 +3,7 @@ package dev.jeankarlo.vehiclerenting.service;
 import java.util.List;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
@@ -31,4 +32,6 @@ public interface VehicleService {
     void uploadVehicleImage(Long vehicleId, Long ownerId, MultipartFile file);
 
     List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long ownerId);
+
+    Vehicle getEntityById(Long vehicleId);
 }

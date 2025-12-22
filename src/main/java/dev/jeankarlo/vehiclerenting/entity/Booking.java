@@ -1,12 +1,16 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
@@ -25,11 +29,13 @@ public class Booking {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
+    @JsonIgnore
     private Vehicle vehicle;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "renter_id", nullable = false)
+    @JsonIgnore
     private Account renter;
 
     @NotNull
@@ -44,15 +50,14 @@ public class Booking {
     @Column(name = "total_price_cents", nullable = false)
     private Long totalPriceCents;
 
-    @Size(max = 20)
     @NotNull
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
-    @NotNull
-    @ColumnDefault("now()")
-    @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Instant createdAt;
 
     @OneToMany(mappedBy = "booking")
     private Set<Inspection> inspections = new LinkedHashSet<>();
