@@ -18,28 +18,28 @@ CREATE TABLE location
     country      VARCHAR(50)  NOT NULL,
     latitude     DECIMAL(9, 6),
     longitude    DECIMAL(9, 6),
-    owner_id          BIGINT         NOT NULL,
+    owner_id     BIGINT       NOT NULL,
 
     CONSTRAINT fk_location_owner FOREIGN KEY (owner_id) REFERENCES account (id)
 );
 
 CREATE TABLE vehicle
 (
-    id                BIGSERIAL PRIMARY KEY,
-    brand             VARCHAR(50)    NOT NULL,
-    model             VARCHAR(50)    NOT NULL,
-    fuel_type         VARCHAR(20)    NOT NULL CHECK (fuel_type IN ('PETROL', 'DIESEL', 'ETHANOL', 'ELECTRIC', 'HYBRID')),
-    vehicle_type      VARCHAR(20)    NOT NULL CHECK (vehicle_type IN
-                                                     ('HATCHBACK', 'SEDAN', 'SUV', 'PICKUP', 'VAN', 'MOTORCYCLE')),
-    year_manufactured INT            NOT NULL,
-    license_plate     VARCHAR(20)    NOT NULL UNIQUE,
-    color             VARCHAR(30),
-    price_per_day_cents    BIGINT NOT NULL,
-    description       TEXT           NOT NULL,
-    is_active         BOOLEAN                 DEFAULT TRUE,
-    created_at        TIMESTAMPTZ    NOT NULL DEFAULT now(),
-    owner_id          BIGINT         NOT NULL,
-    location_id       BIGINT         NOT NULL,
+    id                  BIGSERIAL PRIMARY KEY,
+    brand               VARCHAR(50) NOT NULL,
+    model               VARCHAR(50) NOT NULL,
+    fuel_type           VARCHAR(20) NOT NULL CHECK (fuel_type IN ('PETROL', 'DIESEL', 'ETHANOL', 'ELECTRIC', 'HYBRID')),
+    vehicle_type        VARCHAR(20) NOT NULL CHECK (vehicle_type IN
+                                                    ('HATCHBACK', 'SEDAN', 'SUV', 'PICKUP', 'VAN', 'MOTORCYCLE')),
+    year_manufactured   INT         NOT NULL,
+    license_plate       VARCHAR(20) NOT NULL UNIQUE,
+    color               VARCHAR(30),
+    price_per_day_cents BIGINT      NOT NULL,
+    description         TEXT        NOT NULL,
+    is_active           BOOLEAN              DEFAULT TRUE,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    owner_id            BIGINT      NOT NULL,
+    location_id         BIGINT      NOT NULL,
 
     CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES account (id),
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location (id)
@@ -48,9 +48,36 @@ CREATE TABLE vehicle
 CREATE TABLE vehicle_image
 (
     id         BIGSERIAL PRIMARY KEY,
-    vehicle_id BIGINT    NOT NULL,
-    url  VARCHAR(255) NOT NULL,
+    vehicle_id BIGINT       NOT NULL,
+    url        VARCHAR(255) NOT NULL,
 
     CONSTRAINT fk_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE
+);
+
+CREATE TABLE booking
+(
+    id                BIGSERIAL PRIMARY KEY,
+    vehicle_id        BIGINT      NOT NULL,
+    renter_id         BIGINT      NOT NULL,
+    start_date        DATE        NOT NULL,
+    end_date          DATE        NOT NULL,
+    total_price_cents BIGINT      NOT NULL,
+    status            VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'ACTIVE', 'COMPLETED')),
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT fk_booking_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id),
+    CONSTRAINT fk_booking_renter FOREIGN KEY (renter_id) REFERENCES account (id)
+);
+
+CREATE TABLE inspection
+(
+    id              BIGSERIAL PRIMARY KEY,
+    booking_id      BIGINT      NOT NULL,
+    inspection_date TIMESTAMPTZ NOT NULL DEFAULT now(),
+    type            VARCHAR(20) NOT NULL CHECK (type IN ('PICK_UP', 'DROP_OFF')),
+    comments        TEXT,
+    status          VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED')),
+
+    CONSTRAINT fk_inspection_booking FOREIGN KEY (booking_id) REFERENCES booking (id)
 );
 
