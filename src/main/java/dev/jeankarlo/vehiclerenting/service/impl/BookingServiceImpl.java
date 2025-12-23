@@ -5,6 +5,7 @@ import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.exception.InvalidDataRangeException;
 import dev.jeankarlo.vehiclerenting.exception.VehicleUnavailableException;
 import dev.jeankarlo.vehiclerenting.mapper.BookingMapper;
@@ -13,10 +14,10 @@ import dev.jeankarlo.vehiclerenting.service.AccountService;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -73,5 +74,43 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsByOwner(Long ownerId) {
         return bookingRepository.findByVehicle_Owner_Id(ownerId);
+    }
+
+    @Transactional
+    public void confirmBooking(Long bookingId, Long ownerId) {
+        Booking booking = this.findEntityById(bookingId);
+
+        if (!booking.getVehicle().getOwner().getId().equals(ownerId)) {
+            throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
+        }
+
+        if(booking.getStatus() != BookingStatus.PENDING) {
+            throw new BusinessException("Apenas reservas pendentes podem ser confirmadas.", HttpStatus.BAD_REQUEST);
+        }
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+    }
+
+    @Transactional
+    public void cancelBooking(Long bookingId, Long ownerId) {
+        Booking booking = this.findEntityById(bookingId);
+
+        if (!booking.getVehicle().getOwner().getId().equals(ownerId)) {
+            throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
+        }
+
+        if(booking.getStatus() != BookingStatus.PENDING) {
+            throw new BusinessException("Apenas reservas pendentes podem ser canceladas.", HttpStatus.BAD_REQUEST);
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    public Booking findEntityById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BusinessException("Booking com o ID " + bookingId + " não encontrado.", HttpStatus.NOT_FOUND));
     }
 }

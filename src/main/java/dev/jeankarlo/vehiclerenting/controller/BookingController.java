@@ -37,4 +37,24 @@ public class BookingController {
         Long ownerId = account.getId();
         return ResponseEntity.ok(bookingService.getBookingsByOwner(ownerId));
     }
+
+    @PatchMapping("/{bookingId}/confirm" )
+    public ResponseEntity<Void> confirmBooking(
+            @PathVariable Long bookingId,
+            @AuthenticationPrincipal Account account
+    ){
+        Long ownerId = account.getId();
+        bookingService.confirmBooking(bookingId, ownerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{bookingId}/cancel" )
+    public ResponseEntity<Void> cancelBooking(
+            @PathVariable Long bookingId,
+            @AuthenticationPrincipal Account account
+    ){
+        Long ownerId = account.getId();
+        bookingService.cancelBooking(bookingId, ownerId);
+        return ResponseEntity.noContent().build();
+    }
 }
