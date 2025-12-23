@@ -2,6 +2,7 @@ package dev.jeankarlo.vehiclerenting.controller;
 
 import java.util.List;
 
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
 import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/vehicles")
-@PreAuthorize("hasRole('RENTING_PARTNER')")
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -42,6 +42,7 @@ public class VehicleController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public VehicleResponseDTO create(
             @RequestBody @Valid VehicleRequestDTO createVehicleDTO,
             @AuthenticationPrincipal Account account) {
@@ -50,6 +51,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<VehicleResponseDTO> getById(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -58,6 +60,7 @@ public class VehicleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<List<VehicleResponseDTO>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -68,6 +71,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<Void> deleteById(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -77,6 +81,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
             @PathVariable Long id,
             @RequestBody @Valid VehiclePatchDTO vehiclePatchDTO,
@@ -86,6 +91,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<Void> deactivate(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -95,6 +101,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<Void> activate(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -104,6 +111,7 @@ public class VehicleController {
     }
 
     @PostMapping("/{id}/images")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<Void> uploadVehicleImage(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
@@ -113,10 +121,19 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}/images")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
     public ResponseEntity<List<VehicleImageResponseDTO>> getVehicleImage(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
         Long ownerId = account.getId();
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleService.getVehicleImages(id, ownerId));
     }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<VehicleResponseDTO>> findVehicleAvailable(
+            @Valid VehicleSearchFilter vehicleSearchFilter
+            ) {
+        return ResponseEntity.ok(vehicleService.findAvailableVehicle(vehicleSearchFilter));
+    }
+
 }

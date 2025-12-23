@@ -1,7 +1,9 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
 import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Location;
 import dev.jeankarlo.vehiclerenting.entity.VehicleImage;
@@ -10,9 +12,11 @@ import dev.jeankarlo.vehiclerenting.mapper.VehicleImageMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleImageRepository;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.LocationService;
+import dev.jeankarlo.vehiclerenting.specifications.VehicleSpec;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -136,5 +140,16 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle getEntityById(Long vehicleId) {
         return vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new BusinessException("Veiculo com o ID: " + vehicleId + " não encontrado.", HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public List<VehicleResponseDTO> findAvailableVehicle(VehicleSearchFilter vehicleSearchFilter) {
+        Specification<Vehicle> spec = VehicleSpec.hasCity(vehicleSearchFilter.city()).and(VehicleSpec.isAvailable(vehicleSearchFilter.startDate(), vehicleSearchFilter.endDate()));
+
+        List<Vehicle> vehicles = vehicleRepository.findAll(spec);
+
+        return vehicles.stream()
+                .map(vehicleMapper::toResponseDTO)
+                .toList();
     }
 }

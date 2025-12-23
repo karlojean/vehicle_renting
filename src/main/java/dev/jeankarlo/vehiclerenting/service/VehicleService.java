@@ -1,7 +1,9 @@
 package dev.jeankarlo.vehiclerenting.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
 import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +36,6 @@ public interface VehicleService {
     List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long ownerId);
 
     Vehicle getEntityById(Long vehicleId);
+
+    List<VehicleResponseDTO> findAvailableVehicle(VehicleSearchFilter vehicleSearchFilter);
 }
