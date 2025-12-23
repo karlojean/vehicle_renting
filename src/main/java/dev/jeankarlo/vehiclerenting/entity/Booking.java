@@ -60,6 +60,7 @@ public class Booking {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "booking")
+    @JsonIgnore
     private Set<Inspection> inspections = new LinkedHashSet<>();
 
 }

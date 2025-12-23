@@ -6,10 +6,9 @@ import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -31,4 +30,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.create(bookingRequestDTO, accountId));
     }
 
+    @GetMapping("/owner")
+    public ResponseEntity<List<Booking>> getBookingsByOwner(
+            @AuthenticationPrincipal Account account
+    ){
+        Long ownerId = account.getId();
+        return ResponseEntity.ok(bookingService.getBookingsByOwner(ownerId));
+    }
 }

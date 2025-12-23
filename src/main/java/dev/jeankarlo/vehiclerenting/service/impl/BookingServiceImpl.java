@@ -16,6 +16,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -66,5 +68,10 @@ public class BookingServiceImpl implements BookingService {
 
 
         return bookingRepository.save(booking);
+    }
+
+    @Override
+    public List<Booking> getBookingsByOwner(Long ownerId) {
+        return bookingRepository.findByVehicle_Owner_Id(ownerId);
     }
 }
