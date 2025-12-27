@@ -1,13 +1,14 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
+import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
+import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -27,19 +28,19 @@ public class Inspection {
     @NotNull
     @ColumnDefault("now()")
     @Column(name = "inspection_date", nullable = false)
-    private OffsetDateTime inspectionDate;
+    private Instant inspectionDate;
 
-    @Size(max = 20)
     @NotNull
     @Column(name = "type", nullable = false, length = 20)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private InspectionType type;
 
     @Column(name = "comments", length = Integer.MAX_VALUE)
     private String comments;
 
-    @Size(max = 20)
     @NotNull
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private InspectionStatus status;
 
 }
