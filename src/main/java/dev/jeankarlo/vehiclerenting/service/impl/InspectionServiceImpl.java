@@ -1,20 +1,21 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
-import dev.jeankarlo.vehiclerenting.entity.Booking;
-import dev.jeankarlo.vehiclerenting.entity.Inspection;
-import dev.jeankarlo.vehiclerenting.entity.Vehicle;
+import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
+import dev.jeankarlo.vehiclerenting.repository.InspectionImageRepository;
 import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
+import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.InspectionService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,11 +26,15 @@ public class InspectionServiceImpl implements InspectionService {
     private final BookingService bookingService;
     private final VehicleService vehicleService;
     private final InspectionRepository inspectionRepository;
+    private final FileStorageService fileStorageService;
+    private final InspectionImageRepository inspectionImageRepository;
 
-    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository) {
+    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService, InspectionImageRepository inspectionImageRepository) {
         this.bookingService = bookingService;
         this.vehicleService = vehicleService;
         this.inspectionRepository = inspectionRepository;
+        this.fileStorageService = fileStorageService;
+        this.inspectionImageRepository = inspectionImageRepository;
     }
 
     @Override
@@ -54,6 +59,21 @@ public class InspectionServiceImpl implements InspectionService {
         inspection.setInspectionDate(Instant.now());
 
         inspectionRepository.save(inspection);
+    }
+
+
+    @Override
+    public void uploadInspectionImage(Long inspectionId,  MultipartFile file, Long ownerId) {
+        Inspection inspection = inspectionRepository.findById(inspectionId)
+                .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
+
+        String url =  fileStorageService.uploadFile(file);
+
+        InspectionImage inspectionImage = new InspectionImage();
+        inspectionImage.setUrl(url);
+        inspectionImage.setInspection(inspection);
+
+        inspectionImageRepository.save(inspectionImage);
     }
 
 

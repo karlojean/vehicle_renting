@@ -81,3 +81,11 @@ CREATE TABLE inspection
     CONSTRAINT fk_inspection_booking FOREIGN KEY (booking_id) REFERENCES booking (id)
 );
 
+CREATE TABLE inspection_image
+(
+    id            BIGSERIAL PRIMARY KEY,
+    inspection_id BIGINT       NOT NULL,
+    url           VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_inspection FOREIGN KEY (inspection_id) REFERENCES inspection (id) ON DELETE CASCADE
+);
