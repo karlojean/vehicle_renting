@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -64,6 +65,11 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> badCredentials(BadCredentialsException e, HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Credenciais inválidas", request);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiError> authorizationDenied(AuthorizationDeniedException e, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Acesso negado", request);
     }
 
     private ResponseEntity<ApiError> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {
