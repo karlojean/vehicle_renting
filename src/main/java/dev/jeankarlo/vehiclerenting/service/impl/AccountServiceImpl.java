@@ -29,6 +29,10 @@ public class AccountServiceImpl implements AccountService {
             throw new BusinessException("Já existe uma conta utilizando este email", HttpStatus.CONFLICT);
         }
 
+        if(accountRepository.existsByUsername((accountCreateDTO.username()))) {
+            throw new BusinessException("Já existe uma conta utilizando este nome de usuário", HttpStatus.CONFLICT);
+        }
+
         Account account = accountMapper.toEntity(accountCreateDTO);
         account.setPassword(passwordEncoder.encode(accountCreateDTO.password()));
 
