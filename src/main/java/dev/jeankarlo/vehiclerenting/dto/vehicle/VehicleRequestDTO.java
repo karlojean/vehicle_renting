@@ -13,11 +13,11 @@ public record VehicleRequestDTO(
         @NotNull VehicleFuelType fuelType,
         @NotNull VehicleType vehicleType,
         @NotNull Integer yearManufactured,
-        @NotNull String licensePlate,
+        @NotEmpty String licensePlate,
         @Size(max = 30) String color,
         @NotNull Long pricePerDayCents,
-        @NotNull String description,
-        Long locationId
+        @NotEmpty String description,
+        @NotNull Long locationId
 
         ) {
 }
