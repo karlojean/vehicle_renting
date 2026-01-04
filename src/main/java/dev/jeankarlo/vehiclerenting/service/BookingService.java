@@ -8,6 +8,7 @@ import java.util.List;
 public interface BookingService {
     Booking create(BookingRequestDTO bookingRequestDTO, Long accountId);
     List<Booking> getBookingsByOwner(Long ownerId);
+    List<Booking> getBookingsByRenter(Long requesterId);
     void confirmBooking(Long bookingId, Long ownerId);
     void cancelBooking(Long bookingId, Long ownerId);
     Booking findEntityById(Long bookingId);

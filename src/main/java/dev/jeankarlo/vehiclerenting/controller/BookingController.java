@@ -5,6 +5,7 @@ import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +31,22 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.create(bookingRequestDTO, accountId));
     }
 
-    @GetMapping("/owner")
-    public ResponseEntity<List<Booking>> getBookingsByOwner(
+    @GetMapping("/received")
+    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    public ResponseEntity<List<Booking>> getReceivedBookings(
             @AuthenticationPrincipal Account account
     ){
         Long ownerId = account.getId();
         return ResponseEntity.ok(bookingService.getBookingsByOwner(ownerId));
+    }
+
+    @GetMapping("/my-requests")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<List<Booking>> getRequestsBooking(
+            @AuthenticationPrincipal Account account
+    ){
+        Long accountId  = account.getId();
+        return ResponseEntity.ok(bookingService.getBookingsByRenter(accountId));
     }
 
     @PatchMapping("/{bookingId}/confirm" )

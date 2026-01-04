@@ -19,5 +19,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean existsOverlap(Long vehicleId, LocalDate startDate, LocalDate endDate);
 
     List<Booking> findByVehicle_Owner_Id(Long ownerId);
-
+    List<Booking> findByRenter_Id(Long renterId);
 }

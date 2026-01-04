@@ -76,6 +76,11 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByVehicle_Owner_Id(ownerId);
     }
 
+    @Override
+    public List<Booking> getBookingsByRenter(Long renterId) {
+        return bookingRepository.findByRenter_Id(renterId);
+    }
+
     @Transactional
     public void confirmBooking(Long bookingId, Long ownerId) {
         Booking booking = this.findEntityById(bookingId);
