@@ -1,4 +1,4 @@
-package dev.jeankarlo.vehiclerenting.config.security;
+package dev.jeankarlo.vehiclerenting.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
