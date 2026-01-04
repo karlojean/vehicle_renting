@@ -130,6 +130,7 @@ public class VehicleController {
     }
 
     @GetMapping("/available")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<List<VehicleResponseDTO>> findVehicleAvailable(
             @Valid VehicleSearchFilter vehicleSearchFilter
             ) {
