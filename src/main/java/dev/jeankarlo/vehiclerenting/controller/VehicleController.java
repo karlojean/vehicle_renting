@@ -42,7 +42,7 @@ public class VehicleController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public VehicleResponseDTO create(
             @RequestBody @Valid VehicleRequestDTO createVehicleDTO,
             @AuthenticationPrincipal Account account) {
@@ -51,7 +51,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<VehicleResponseDTO> getById(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -60,7 +60,7 @@ public class VehicleController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<List<VehicleResponseDTO>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -71,7 +71,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<Void> deleteById(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -81,7 +81,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
             @PathVariable Long id,
             @RequestBody @Valid VehiclePatchDTO vehiclePatchDTO,
@@ -91,7 +91,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<Void> deactivate(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -101,7 +101,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<Void> activate(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -111,7 +111,7 @@ public class VehicleController {
     }
 
     @PostMapping("/{id}/images")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<Void> uploadVehicleImage(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
@@ -121,7 +121,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}/images")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<List<VehicleImageResponseDTO>> getVehicleImage(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
@@ -130,7 +130,7 @@ public class VehicleController {
     }
 
     @GetMapping("/available")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('RENTER')")
     public ResponseEntity<List<VehicleResponseDTO>> findVehicleAvailable(
             @Valid VehicleSearchFilter vehicleSearchFilter
             ) {

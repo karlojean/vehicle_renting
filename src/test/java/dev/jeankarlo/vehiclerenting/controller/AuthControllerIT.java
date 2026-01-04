@@ -38,7 +38,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
                 "JohnDoe",
                 "johndoe@mail.com",
                 "111",
-                AccountRole.RENTING_PARTNER
+                AccountRole.PARTNER
         );
 
         given()
@@ -59,7 +59,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
                 "JohnDoe",
                 "johndoe@",
                 "111",
-                AccountRole.RENTING_PARTNER
+                AccountRole.PARTNER
         );
 
         given()
@@ -78,7 +78,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         Account account = new Account();
         account.setUsername("JohnDoe");
         account.setEmail("johndoe@mail.com");
-        account.setRole(AccountRole.RENTING_PARTNER);
+        account.setRole(AccountRole.PARTNER);
         account.setPassword(passwordEncoder.encode("secret"));
 
         accountRepository.save(account);
@@ -87,7 +87,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
                 "JohnDoe12",
                 "johndoe@mail.com",
                 "111",
-                AccountRole.RENTING_PARTNER
+                AccountRole.PARTNER
         );
 
         given()
@@ -107,7 +107,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         Account account = new Account();
         account.setUsername("JohnDoe");
         account.setEmail("johndoe@mail.com");
-        account.setRole(AccountRole.RENTING_PARTNER);
+        account.setRole(AccountRole.PARTNER);
         account.setPassword(passwordEncoder.encode("secret"));
 
         accountRepository.save(account);
@@ -116,7 +116,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
                 "JohnDoe",
                 "johndoe22@mail.com",
                 "111",
-                AccountRole.RENTING_PARTNER
+                AccountRole.PARTNER
         );
 
         given()
@@ -135,7 +135,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         Account account = new Account();
         account.setUsername("JohnDoe");
         account.setEmail("johndoe@mail.com");
-        account.setRole(AccountRole.RENTING_PARTNER);
+        account.setRole(AccountRole.PARTNER);
         account.setPassword(passwordEncoder.encode("secret"));
 
         accountRepository.save(account);

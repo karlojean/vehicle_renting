@@ -15,7 +15,7 @@ public interface VehicleMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Vehicle toEntity(VehicleRequestDTO dto);
@@ -26,7 +26,7 @@ public interface VehicleMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateVehicle(@MappingTarget Vehicle vehicle, VehiclePatchDTO vehiclePatchDTO);
 

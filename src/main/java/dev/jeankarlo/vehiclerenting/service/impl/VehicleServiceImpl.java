@@ -60,7 +60,7 @@ public class VehicleServiceImpl implements VehicleService {
         Location location = locationService.getEntityById(vehicleCreateDTO.locationId());
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
 
-        vehicle.setOwner(account);
+        vehicle.setPartner(account);
         vehicle.setLocation(location);
         vehicle.setIsActive(true);
         return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
@@ -75,7 +75,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleResponseDTO> getAll(Long ownerId, Pageable pageable) {
         Account account = accountService.getEntityById(ownerId);
-        Page<Vehicle> vehicles = vehicleRepository.findByOwner(account, pageable);
+        Page<Vehicle> vehicles = vehicleRepository.findByPartner(account, pageable);
         return vehicles.map(vehicleMapper::toResponseDTO).toList();
     }
 
@@ -110,7 +110,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
-        return vehicleRepository.findByIdAndOwner_Id(id, ownerId)
+        return vehicleRepository.findByIdAndPartner_Id(id, ownerId)
                 .orElseThrow(() -> new BusinessException("Veiculo não encontrado ou não pertence ao usuário.", HttpStatus.NOT_FOUND));
     }
 

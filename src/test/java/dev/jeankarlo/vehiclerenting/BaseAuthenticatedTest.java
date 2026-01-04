@@ -36,11 +36,11 @@ public class BaseAuthenticatedTest extends BaseIntegrationTest {
     }
 
     private Account createRentingPartnerAccount() {
-        return createAccountWithRole(AccountRole.RENTING_PARTNER);
+        return createAccountWithRole(AccountRole.PARTNER);
     }
 
     private Account createCustomerAccount() {
-        return createAccountWithRole(AccountRole.CUSTOMER);
+        return createAccountWithRole(AccountRole.RENTER);
     }
 
     private Account createAccountWithRole(AccountRole role) {

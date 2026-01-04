@@ -168,13 +168,20 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomerAccount = getCurrentAccount(foreignCustomerToken);
+        String customerToken = createAndLoginAsCustomer();
+        Account customerAccount = getCurrentAccount(customerToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(5);
 
-        Booking booking = createBooking(vehicle, foreignCustomerAccount, startDate, endDate);
+        Booking booking = new Booking();
+        booking.setVehicle(vehicle);
+        booking.setRenter(customerAccount);
+        booking.setStatus(BookingStatus.PENDING);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+        booking.setTotalPriceCents( (endDate.toEpochDay() - startDate.toEpochDay() + 1) * vehicle.getPricePerDayCents());
+        bookingRepository.save(booking);
 
         given()
                 .header("Authorization", "Bearer " + partnerToken)
@@ -192,19 +199,26 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomerAccount = getCurrentAccount(foreignCustomerToken);
+        String customerToken = createAndLoginAsCustomer();
+        Account customerAccount = getCurrentAccount(customerToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(5);
 
-        Booking booking = createBooking(vehicle, foreignCustomerAccount, startDate, endDate);
+        Booking booking = new Booking();
+        booking.setVehicle(vehicle);
+        booking.setRenter(customerAccount);
+        booking.setStatus(BookingStatus.PENDING);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+        booking.setTotalPriceCents( (endDate.toEpochDay() - startDate.toEpochDay() + 1) * vehicle.getPricePerDayCents());
+        bookingRepository.save(booking);
 
         given()
                 .header("Authorization", "Bearer " + partnerToken)
-        .when()
+                .when()
                 .patch("/bookings/{bookingId}/cancel", booking.getId())
-        .then()
+                .then()
                 .statusCode(204);
     }
 
@@ -260,7 +274,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
                 .statusCode(403);
     }
 
-    private Location createAndSaveLocation(Account owner) {
+    private Location createAndSaveLocation(Account partner) {
         Location location = new Location();
         location.setAddressLine("Rua das Flores, 123");
         location.setCity("São Paulo");
@@ -269,7 +283,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         location.setPinCode("01234-567");
         location.setLatitude(BigDecimal.valueOf(-23.55052));
         location.setLongitude(BigDecimal.valueOf(-46.633308));
-        location.setOwner(owner);
+        location.setPartner(partner);
 
         return locationRepository.save(location);
     }
@@ -286,7 +300,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         vehicle.setPricePerDayCents(5000L);
         vehicle.setDescription("Generic vehicle for test");
         vehicle.setLocation(location);
-        vehicle.setOwner(account);
+        vehicle.setPartner(account);
         return vehicleRepository.save(vehicle);
     }
 

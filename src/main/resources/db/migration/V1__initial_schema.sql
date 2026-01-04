@@ -18,9 +18,9 @@ CREATE TABLE location
     country      VARCHAR(50)  NOT NULL,
     latitude     DECIMAL(9, 6),
     longitude    DECIMAL(9, 6),
-    owner_id     BIGINT       NOT NULL,
+    partner_id     BIGINT       NOT NULL,
 
-    CONSTRAINT fk_location_owner FOREIGN KEY (owner_id) REFERENCES account (id)
+    CONSTRAINT fk_location_partner FOREIGN KEY (partner_id) REFERENCES account (id)
 );
 
 CREATE TABLE vehicle
@@ -38,10 +38,10 @@ CREATE TABLE vehicle
     description         TEXT        NOT NULL,
     is_active           BOOLEAN              DEFAULT TRUE,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    owner_id            BIGINT      NOT NULL,
+    partner_id            BIGINT      NOT NULL,
     location_id         BIGINT      NOT NULL,
 
-    CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES account (id),
+    CONSTRAINT fk_partner FOREIGN KEY (partner_id) REFERENCES account (id),
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location (id)
 );
 

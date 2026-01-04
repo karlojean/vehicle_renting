@@ -73,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getBookingsByOwner(Long ownerId) {
-        return bookingRepository.findByVehicle_Owner_Id(ownerId);
+        return bookingRepository.findByVehicle_Partner_Id(ownerId);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
     public void confirmBooking(Long bookingId, Long ownerId) {
         Booking booking = this.findEntityById(bookingId);
 
-        if (!booking.getVehicle().getOwner().getId().equals(ownerId)) {
+        if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
         }
 
@@ -101,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
     public void cancelBooking(Long bookingId, Long ownerId) {
         Booking booking = this.findEntityById(bookingId);
 
-        if (!booking.getVehicle().getOwner().getId().equals(ownerId)) {
+        if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
         }
 

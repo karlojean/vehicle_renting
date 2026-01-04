@@ -72,8 +72,8 @@ public class Vehicle {
     private Boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private Account owner;
+    @JoinColumn(name = "partner_id", nullable = false)
+    private Account partner;
 
     @Column(name = "created_at")
     @CreationTimestamp

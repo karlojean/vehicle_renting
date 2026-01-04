@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpecificationExecutor<Vehicle> {
-    Page<Vehicle> findByOwner(Account owner, Pageable pageable);
-    Optional<Vehicle> findByIdAndOwner_Id(Long id, Long ownerId);
+    Page<Vehicle> findByPartner(Account owner, Pageable pageable);
+    Optional<Vehicle> findByIdAndPartner_Id(Long id, Long ownerId);
 }

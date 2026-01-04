@@ -408,11 +408,11 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         vehicle.setPricePerDayCents(5000L);
         vehicle.setDescription("Generic vehicle for test");
         vehicle.setLocation(location);
-        vehicle.setOwner(account);
+        vehicle.setPartner(account);
         return vehicleRepository.save(vehicle);
     }
 
-    private Location createAndSaveLocation(Account owner) {
+    private Location createAndSaveLocation(Account partner) {
         Location location = new Location();
         location.setAddressLine("Rua das Flores, 123");
         location.setCity("São Paulo");
@@ -421,7 +421,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         location.setPinCode("01234-567");
         location.setLatitude(BigDecimal.valueOf(-23.55052));
         location.setLongitude(BigDecimal.valueOf(-46.633308));
-        location.setOwner(owner);
+        location.setPartner(partner);
 
         return locationRepository.save(location);
     }

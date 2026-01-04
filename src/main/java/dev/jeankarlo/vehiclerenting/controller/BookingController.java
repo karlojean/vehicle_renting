@@ -32,7 +32,7 @@ public class BookingController {
     }
 
     @GetMapping("/received")
-    @PreAuthorize("hasRole('RENTING_PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<List<Booking>> getReceivedBookings(
             @AuthenticationPrincipal Account account
     ){
@@ -41,7 +41,7 @@ public class BookingController {
     }
 
     @GetMapping("/my-requests")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('RENTER')")
     public ResponseEntity<List<Booking>> getRequestsBooking(
             @AuthenticationPrincipal Account account
     ){
