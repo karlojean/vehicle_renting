@@ -40,7 +40,7 @@ public class InspectionServiceImpl implements InspectionService {
     @Override
     @Transactional
     public void initInspection(InspectionInitDTO inspectionInitDTO, Long ownerId) {
-        Booking booking = bookingService.findEntityById(inspectionInitDTO.bookingId());
+        Booking booking = bookingService.getEntityById(inspectionInitDTO.bookingId());
 
         vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), ownerId);
 

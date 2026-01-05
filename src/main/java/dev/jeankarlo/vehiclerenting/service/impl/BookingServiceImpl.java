@@ -83,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     public void confirmBooking(Long bookingId, Long ownerId) {
-        Booking booking = this.findEntityById(bookingId);
+        Booking booking = this.getEntityById(bookingId);
 
         if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
@@ -99,7 +99,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     public void cancelBooking(Long bookingId, Long ownerId) {
-        Booking booking = this.findEntityById(bookingId);
+        Booking booking = this.getEntityById(bookingId);
 
         if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
@@ -114,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking findEntityById(Long bookingId) {
+    public Booking getEntityById(Long bookingId) {
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BusinessException("Booking com o ID " + bookingId + " não encontrado.", HttpStatus.NOT_FOUND));
     }

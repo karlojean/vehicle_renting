@@ -11,6 +11,6 @@ public interface BookingService {
     List<Booking> getBookingsByRenter(Long requesterId);
     void confirmBooking(Long bookingId, Long ownerId);
     void cancelBooking(Long bookingId, Long ownerId);
-    Booking findEntityById(Long bookingId);
+    Booking getEntityById(Long bookingId);
 }
 
