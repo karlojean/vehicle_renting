@@ -6,20 +6,21 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public record AccountCreateDTO(
-        @NotEmpty
+        @NotEmpty(message = "Nome de Usuário não pode ser vazio")
         String username,
 
-        @NotEmpty
-        @Email
+        @NotEmpty(message = "Email não pode ser vazio")
+        @Email(message = "Email deve ser válido")
         String email,
 
-        @Size(min = 10, max = 11)
+        @Size(min = 10, max = 11, message = "Número de telefone deve conter entre 10 e 11 dígitos")
         String phoneNumber,
 
-        @NotEmpty
+        @NotEmpty(message = "Senha não pode ser vazia")
+        @Size(min = 6, message = "Senha deve conter no mínimo 6 caracteres")
         String password,
 
-        @NotEmpty
+        @NotEmpty(message = "Função da conta não pode ser vazia")
         AccountRole role
 ) {
 }
