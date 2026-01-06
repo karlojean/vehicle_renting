@@ -7,11 +7,11 @@ import dev.jeankarlo.vehiclerenting.entity.Booking;
 import java.util.List;
 
 public interface BookingService {
-    BookingResponseDTO create(BookingRequestDTO bookingRequestDTO, Long accountId);
-    List<BookingResponseDTO> getBookingsByOwner(Long ownerId);
-    List<BookingResponseDTO> getBookingsByRenter(Long requesterId);
-    void confirmBooking(Long bookingId, Long ownerId);
-    void cancelBooking(Long bookingId, Long ownerId);
+    BookingResponseDTO create(BookingRequestDTO bookingRequestDTO, Long renterId);
+    List<BookingResponseDTO> getBookingsByOwner(Long partnerId);
+    List<BookingResponseDTO> getBookingsByRenter(Long renterId);
+    void confirmBooking(Long bookingId, Long partnerId);
+    void cancelBooking(Long bookingId, Long partnerId);
     Booking getEntityById(Long bookingId);
 }
 

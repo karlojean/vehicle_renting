@@ -39,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponseDTO create(BookingRequestDTO bookingRequestDTO, Long accountId) {
+    public BookingResponseDTO create(BookingRequestDTO bookingRequestDTO, Long renterId) {
 
         Vehicle vehicle = vehicleService.getEntityById(bookingRequestDTO.vehicleId());
 
@@ -61,7 +61,7 @@ public class BookingServiceImpl implements BookingService {
         Long rentalDays = ChronoUnit.DAYS.between(bookingRequestDTO.startDate(), bookingRequestDTO.endDate());
         Long totalPrice = Math.multiplyExact(vehicle.getPricePerDayCents(), rentalDays);
 
-        Account account = accountService.getEntityById(accountId);
+        Account account = accountService.getEntityById(renterId);
 
         Booking booking = bookingMapper.toEntity(bookingRequestDTO);
         booking.setStatus(BookingStatus.PENDING);
@@ -75,8 +75,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDTO> getBookingsByOwner(Long ownerId) {
-        List<Booking> bookings = bookingRepository.findByVehicle_Partner_Id(ownerId);
+    public List<BookingResponseDTO> getBookingsByOwner(Long partnerId) {
+        List<Booking> bookings = bookingRepository.findByVehicle_Partner_Id(partnerId);
 
         return bookings.stream().map(bookingMapper::toResponseDTO).toList();
     }
@@ -89,10 +89,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional
-    public void confirmBooking(Long bookingId, Long ownerId) {
+    public void confirmBooking(Long bookingId, Long partnerId) {
         Booking booking = this.getEntityById(bookingId);
 
-        if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
+        if (!booking.getVehicle().getPartner().getId().equals(partnerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
         }
 
@@ -105,10 +105,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional
-    public void cancelBooking(Long bookingId, Long ownerId) {
+    public void cancelBooking(Long bookingId, Long partnerId) {
         Booking booking = this.getEntityById(bookingId);
 
-        if (!booking.getVehicle().getPartner().getId().equals(ownerId)) {
+        if (!booking.getVehicle().getPartner().getId().equals(partnerId)) {
             throw new BusinessException("Você não tem permissão para aprovar esta reserva.", HttpStatus.FORBIDDEN);
         }
 

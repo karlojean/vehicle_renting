@@ -39,10 +39,10 @@ public class InspectionServiceImpl implements InspectionService {
 
     @Override
     @Transactional
-    public void initInspection(InspectionInitDTO inspectionInitDTO, Long ownerId) {
+    public void initInspection(InspectionInitDTO inspectionInitDTO, Long partnerId) {
         Booking booking = bookingService.getEntityById(inspectionInitDTO.bookingId());
 
-        vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), ownerId);
+        vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), partnerId);
 
         if (inspectionInitDTO.type().equals(InspectionType.PICK_UP) && booking.getStatus() != BookingStatus.CONFIRMED) {
             throw new BusinessException("A abertura de inspeção para retirada só pode ser feita em reservas confirmadas.", HttpStatus.BAD_REQUEST);
@@ -63,7 +63,7 @@ public class InspectionServiceImpl implements InspectionService {
 
 
     @Override
-    public void uploadInspectionImage(Long inspectionId,  MultipartFile file, Long ownerId) {
+    public void uploadInspectionImage(Long inspectionId,  MultipartFile file, Long partnerId) {
         Inspection inspection = inspectionRepository.findById(inspectionId)
                 .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
 

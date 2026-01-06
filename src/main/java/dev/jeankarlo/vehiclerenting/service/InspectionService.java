@@ -5,6 +5,6 @@ import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface InspectionService {
-    void initInspection(InspectionInitDTO inspectionInitDTO, Long ownerId);
-    void uploadInspectionImage(Long inspectionId, MultipartFile file,  Long ownerId);
+    void initInspection(InspectionInitDTO inspectionInitDTO, Long partnerId);
+    void uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId);
 }

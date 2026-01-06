@@ -55,8 +55,8 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
-    public VehicleResponseDTO create(Long ownerId, VehicleRequestDTO vehicleCreateDTO) {
-        Account account = accountService.getEntityById(ownerId);
+    public VehicleResponseDTO create(Long partnerId, VehicleRequestDTO vehicleCreateDTO) {
+        Account account = accountService.getEntityById(partnerId);
         Location location = locationService.getEntityById(vehicleCreateDTO.locationId());
         Vehicle vehicle = vehicleMapper.toEntity(vehicleCreateDTO);
 
@@ -67,27 +67,27 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public VehicleResponseDTO getById(Long ownerId, Long id) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+    public VehicleResponseDTO getById(Long partnerId, Long id) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, partnerId);
         return vehicleMapper.toResponseDTO(vehicle);
     }
 
     @Override
-    public List<VehicleResponseDTO> getAll(Long ownerId, Pageable pageable) {
-        Account account = accountService.getEntityById(ownerId);
+    public List<VehicleResponseDTO> getAll(Long partnerId, Pageable pageable) {
+        Account account = accountService.getEntityById(partnerId);
         Page<Vehicle> vehicles = vehicleRepository.findByPartner(account, pageable);
         return vehicles.map(vehicleMapper::toResponseDTO).toList();
     }
 
     @Override
-    public void deleteById(Long id, Long ownerId) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+    public void deleteById(Long id, Long partnerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, partnerId);
         vehicleRepository.delete(vehicle);
     }
 
     @Override
-    public VehicleResponseDTO updateById(Long id, Long ownerId, VehiclePatchDTO vehiclePatchDTO) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+    public VehicleResponseDTO updateById(Long id, Long partnerId, VehiclePatchDTO vehiclePatchDTO) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, partnerId);
 
         vehicleMapper.updateVehicle(vehicle, vehiclePatchDTO);
 
@@ -95,28 +95,28 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public void deactivate(Long id, Long ownerId) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+    public void deactivate(Long id, Long partnerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, partnerId);
         vehicle.setIsActive(false);
         vehicleRepository.save(vehicle);
     }
 
     @Override
-    public void activate(Long id, Long ownerId) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(id, ownerId);
+    public void activate(Long id, Long partnerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(id, partnerId);
         vehicle.setIsActive(true);
         vehicleRepository.save(vehicle);
     }
 
     @Override
-    public Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId) {
-        return vehicleRepository.findByIdAndPartner_Id(id, ownerId)
+    public Vehicle findVehicleByOwnerOrThrow(Long id, Long partnerId) {
+        return vehicleRepository.findByIdAndPartner_Id(id, partnerId)
                 .orElseThrow(() -> new BusinessException("Veiculo não encontrado ou não pertence ao usuário.", HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public void uploadVehicleImage(Long vehicleId, Long ownerId, MultipartFile file) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, ownerId);
+    public void uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
 
         String url =  fileStorageService.uploadFile(file);
 
@@ -128,8 +128,8 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long ownerId) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, ownerId);
+    public List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long partnerId) {
+        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
 
         List<VehicleImage> vehicleImages = vehicleImageRepository.findByVehicle(vehicle);
 

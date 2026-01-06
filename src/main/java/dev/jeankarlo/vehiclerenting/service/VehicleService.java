@@ -17,23 +17,23 @@ import org.springframework.web.multipart.MultipartFile;
 public interface VehicleService {
     VehicleResponseDTO create(Long id, VehicleRequestDTO vehicleCreateDTO);
 
-    VehicleResponseDTO getById(Long ownerId, Long vehicleId);
+    VehicleResponseDTO getById(Long partnerId, Long vehicleId);
 
-    List<VehicleResponseDTO> getAll(Long ownerId, Pageable pageable);
+    List<VehicleResponseDTO> getAll(Long partnerId, Pageable pageable);
 
-    void deleteById(Long id, Long ownerId);
+    void deleteById(Long id, Long partnerId);
 
-    VehicleResponseDTO updateById(Long id, Long ownerId, VehiclePatchDTO vehiclePatchDTO);
+    VehicleResponseDTO updateById(Long id, Long partnerId, VehiclePatchDTO vehiclePatchDTO);
 
-    void deactivate(Long id, Long ownerId);
+    void deactivate(Long id, Long partnerId);
 
-    void activate(Long id, Long ownerId);
+    void activate(Long id, Long partnerId);
 
-    Vehicle findVehicleByOwnerOrThrow(Long id, Long ownerId);
+    Vehicle findVehicleByOwnerOrThrow(Long id, Long partnerId);
 
-    void uploadVehicleImage(Long vehicleId, Long ownerId, MultipartFile file);
+    void uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file);
 
-    List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long ownerId);
+    List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long partnerId);
 
     Vehicle getEntityById(Long vehicleId);
 
