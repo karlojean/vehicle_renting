@@ -5,7 +5,7 @@ CREATE TABLE account
     email        VARCHAR(100) UNIQUE NOT NULL,
     phone_number VARCHAR(15),
     password     VARCHAR(255)        NOT NULL,
-    role         VARCHAR(20)         NOT NULL
+    role         VARCHAR(20)         NOT NULL CHECK (role IN ('RENTER', 'PARTNER', 'ADMIN'))
 );
 
 CREATE TABLE location
@@ -18,7 +18,7 @@ CREATE TABLE location
     country      VARCHAR(50)  NOT NULL,
     latitude     DECIMAL(9, 6),
     longitude    DECIMAL(9, 6),
-    partner_id     BIGINT       NOT NULL,
+    partner_id   BIGINT       NOT NULL,
 
     CONSTRAINT fk_location_partner FOREIGN KEY (partner_id) REFERENCES account (id)
 );
@@ -38,7 +38,7 @@ CREATE TABLE vehicle
     description         TEXT        NOT NULL,
     is_active           BOOLEAN              DEFAULT TRUE,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    partner_id            BIGINT      NOT NULL,
+    partner_id          BIGINT      NOT NULL,
     location_id         BIGINT      NOT NULL,
 
     CONSTRAINT fk_partner FOREIGN KEY (partner_id) REFERENCES account (id),
