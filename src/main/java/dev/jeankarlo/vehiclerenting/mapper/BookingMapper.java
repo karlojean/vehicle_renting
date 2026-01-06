@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.mapper;
 
 import dev.jeankarlo.vehiclerenting.dto.booking.BookingRequestDTO;
+import dev.jeankarlo.vehiclerenting.dto.booking.BookingResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,4 +11,8 @@ import org.mapstruct.Mapping;
 public interface BookingMapper {
     @Mapping(target = "id", ignore = true)
     Booking toEntity(BookingRequestDTO dto);
+
+    @Mapping(source = "vehicle.id", target = "vehicleId")
+    @Mapping(source = "renter.id", target = "renterId")
+    BookingResponseDTO toResponseDTO(Booking booking);
 }

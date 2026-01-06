@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
 import dev.jeankarlo.vehiclerenting.dto.booking.BookingRequestDTO;
+import dev.jeankarlo.vehiclerenting.dto.booking.BookingResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
@@ -15,6 +16,7 @@ import dev.jeankarlo.vehiclerenting.service.BookingService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
@@ -37,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public Booking create(BookingRequestDTO bookingRequestDTO, Long accountId) {
+    public BookingResponseDTO create(BookingRequestDTO bookingRequestDTO, Long accountId) {
 
         Vehicle vehicle = vehicleService.getEntityById(bookingRequestDTO.vehicleId());
 
@@ -67,18 +69,23 @@ public class BookingServiceImpl implements BookingService {
         booking.setVehicle(vehicle);
         booking.setTotalPriceCents(totalPrice);
 
+        bookingRepository.save(booking);
 
-        return bookingRepository.save(booking);
+        return bookingMapper.toResponseDTO(booking);
     }
 
     @Override
-    public List<Booking> getBookingsByOwner(Long ownerId) {
-        return bookingRepository.findByVehicle_Partner_Id(ownerId);
+    public List<BookingResponseDTO> getBookingsByOwner(Long ownerId) {
+        List<Booking> bookings = bookingRepository.findByVehicle_Partner_Id(ownerId);
+
+        return bookings.stream().map(bookingMapper::toResponseDTO).toList();
     }
 
     @Override
-    public List<Booking> getBookingsByRenter(Long renterId) {
-        return bookingRepository.findByRenter_Id(renterId);
+    public List<BookingResponseDTO> getBookingsByRenter(Long renterId) {
+        List<Booking> bookings =  bookingRepository.findByRenter_Id(renterId);
+
+        return bookings.stream().map(bookingMapper::toResponseDTO).toList();
     }
 
     @Transactional

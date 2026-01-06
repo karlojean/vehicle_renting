@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.controller;
 
 import dev.jeankarlo.vehiclerenting.dto.booking.BookingRequestDTO;
+import dev.jeankarlo.vehiclerenting.dto.booking.BookingResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
@@ -9,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Book;
 import java.util.List;
 
 
@@ -23,7 +25,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<Booking> booking(
+    public ResponseEntity<BookingResponseDTO> booking(
             @RequestBody BookingRequestDTO bookingRequestDTO,
             @AuthenticationPrincipal Account account
     ){
@@ -33,7 +35,7 @@ public class BookingController {
 
     @GetMapping("/received")
     @PreAuthorize("hasRole('PARTNER')")
-    public ResponseEntity<List<Booking>> getReceivedBookings(
+    public ResponseEntity<List<BookingResponseDTO>> getReceivedBookings(
             @AuthenticationPrincipal Account account
     ){
         Long ownerId = account.getId();
@@ -42,7 +44,7 @@ public class BookingController {
 
     @GetMapping("/my-requests")
     @PreAuthorize("hasRole('RENTER')")
-    public ResponseEntity<List<Booking>> getRequestsBooking(
+    public ResponseEntity<List<BookingResponseDTO>> getRequestsBooking(
             @AuthenticationPrincipal Account account
     ){
         Long accountId  = account.getId();
