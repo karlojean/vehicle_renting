@@ -1,6 +1,6 @@
 package dev.jeankarlo.vehiclerenting.mapper;
 
-import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.VehicleImage;
 import org.mapstruct.Mapper;
 

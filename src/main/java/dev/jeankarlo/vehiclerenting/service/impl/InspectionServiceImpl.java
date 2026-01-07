@@ -1,6 +1,8 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
+import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
@@ -16,9 +18,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.Bucket;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class InspectionServiceImpl implements InspectionService {
@@ -63,19 +67,23 @@ public class InspectionServiceImpl implements InspectionService {
 
 
     @Override
-    public void uploadInspectionImage(Long inspectionId,  MultipartFile file, Long partnerId) {
+    public InspectionImageRespondeDTO uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId) {
         Inspection inspection = inspectionRepository.findById(inspectionId)
                 .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
 
-        String url =  fileStorageService.uploadFile(file);
+        String key = "inspections/" + inspectionId + "/" + UUID.randomUUID() + ".pdf";
+
+        String url = fileStorageService.upload(BucketType.INSPECTIONS, String.valueOf(inspection.getId()), file);
 
         InspectionImage inspectionImage = new InspectionImage();
-        inspectionImage.setUrl(url);
+        inspectionImage.setFileKey(key);
         inspectionImage.setInspection(inspection);
 
         inspectionImageRepository.save(inspectionImage);
+
+        return new InspectionImageRespondeDTO(
+                inspectionImage.getId(),
+                url
+        );
     }
-
-
-
 }

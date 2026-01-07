@@ -1,10 +1,11 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
+import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
-import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Location;
 import dev.jeankarlo.vehiclerenting.entity.VehicleImage;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
@@ -115,16 +116,21 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public void uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file) {
+    public VehicleImageResponseDTO uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
 
-        String url =  fileStorageService.uploadFile(file);
+        String key = String.format("vehicles/%s/%s",
+                vehicleId, UUID.randomUUID());
+
+        String url = fileStorageService.upload(BucketType.VEHICLES, key, file);
 
         VehicleImage vehicleImage = new VehicleImage();
-        vehicleImage.setUrl(url);
+        vehicleImage.setFileKey(key);
         vehicleImage.setVehicle(vehicle);
 
         vehicleImageRepository.save(vehicleImage);
+
+        return new VehicleImageResponseDTO(vehicleImage.getId(), url);
     }
 
     @Override
@@ -133,7 +139,13 @@ public class VehicleServiceImpl implements VehicleService {
 
         List<VehicleImage> vehicleImages = vehicleImageRepository.findByVehicle(vehicle);
 
-        return vehicleImages.stream().map(vehicleImageMapper::toResponseDTO).toList();
+        return vehicleImages.stream().map(image -> {
+            String url = fileStorageService.getUrl(
+                    BucketType.VEHICLES,
+                    image.getFileKey()
+            );
+            return new VehicleImageResponseDTO(image.getId(), url);
+        }).toList();
     }
 
     @Override

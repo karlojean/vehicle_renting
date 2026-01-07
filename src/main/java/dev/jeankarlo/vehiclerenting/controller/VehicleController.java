@@ -3,7 +3,7 @@ package dev.jeankarlo.vehiclerenting.controller;
 import java.util.List;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
-import dev.jeankarlo.vehiclerenting.dto.vehicleImage.VehicleImageResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -112,12 +112,11 @@ public class VehicleController {
 
     @PostMapping("/{id}/images")
     @PreAuthorize("hasRole('PARTNER')")
-    public ResponseEntity<Void> uploadVehicleImage(
+    public ResponseEntity<VehicleImageResponseDTO> uploadVehicleImage(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal Account account) {
-        vehicleService.uploadVehicleImage(id, account.getId(), file);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(vehicleService.uploadVehicleImage(id, account.getId(), file));
     }
 
     @GetMapping("/{id}/images")

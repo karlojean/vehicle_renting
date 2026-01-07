@@ -49,7 +49,7 @@ CREATE TABLE vehicle_image
 (
     id         BIGSERIAL PRIMARY KEY,
     vehicle_id BIGINT       NOT NULL,
-    url        VARCHAR(255) NOT NULL,
+    file_key        VARCHAR(255) NOT NULL,
 
     CONSTRAINT fk_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE
 );
@@ -85,7 +85,7 @@ CREATE TABLE inspection_image
 (
     id            BIGSERIAL PRIMARY KEY,
     inspection_id BIGINT       NOT NULL,
-    url           VARCHAR(255) NOT NULL,
+    file_key       VARCHAR(255) NOT NULL,
 
     CONSTRAINT fk_inspection FOREIGN KEY (inspection_id) REFERENCES inspection (id) ON DELETE CASCADE
 );

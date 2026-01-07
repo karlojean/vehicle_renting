@@ -26,7 +26,6 @@ public class InspectionImage {
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "url", nullable = false)
-    private String url;
-
+    @Column(name = "file_key", nullable = false)
+    private String fileKey;
 }
