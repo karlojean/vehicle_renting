@@ -78,6 +78,14 @@ CREATE TABLE inspection
     comments        TEXT,
     status          VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED')),
 
+    odometer_reading INTEGER,
+    fuel_level       INTEGER CHECK (fuel_level BETWEEN 0 AND 100) DEFAULT 0,
+    is_clean_exterior BOOLEAN DEFAULT FALSE,
+    is_clean_interior BOOLEAN DEFAULT FALSE,
+    has_smoke_smell BOOLEAN DEFAULT FALSE,
+    has_spare_tire BOOLEAN DEFAULT TRUE,
+    has_documents BOOLEAN DEFAULT TRUE,
+
     CONSTRAINT fk_inspection_booking FOREIGN KEY (booking_id) REFERENCES booking (id)
 );
 

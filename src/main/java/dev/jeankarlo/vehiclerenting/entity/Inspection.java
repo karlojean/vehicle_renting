@@ -4,6 +4,7 @@ import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -42,5 +43,31 @@ public class Inspection {
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private InspectionStatus status;
+
+    @Column(name = "odometer_reading")
+    private Integer odometerReading;
+
+    @Column(name = "fuel_level")
+    private Integer fuelLevel;
+
+    @ColumnDefault("false")
+    @Column(name = "is_clean_exterior")
+    private Boolean isCleanExterior;
+
+    @ColumnDefault("false")
+    @Column(name = "is_clean_interior")
+    private Boolean isCleanInterior;
+
+    @ColumnDefault("false")
+    @Column(name = "has_smoke_smell")
+    private Boolean hasSmokeSmell;
+
+    @ColumnDefault("true")
+    @Column(name = "has_spare_tire")
+    private Boolean hasSpareTire;
+
+    @ColumnDefault("true")
+    @Column(name = "has_documents")
+    private Boolean hasDocuments;
 
 }
