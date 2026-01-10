@@ -2,12 +2,14 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 
 import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
+import dev.jeankarlo.vehiclerenting.mapper.InspectionMapper;
 import dev.jeankarlo.vehiclerenting.repository.InspectionImageRepository;
 import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
@@ -32,18 +34,20 @@ public class InspectionServiceImpl implements InspectionService {
     private final InspectionRepository inspectionRepository;
     private final FileStorageService fileStorageService;
     private final InspectionImageRepository inspectionImageRepository;
+    private final InspectionMapper inspectionMapper;
 
-    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService, InspectionImageRepository inspectionImageRepository) {
+    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService, InspectionImageRepository inspectionImageRepository, InspectionMapper inspectionMapper) {
         this.bookingService = bookingService;
         this.vehicleService = vehicleService;
         this.inspectionRepository = inspectionRepository;
         this.fileStorageService = fileStorageService;
         this.inspectionImageRepository = inspectionImageRepository;
+        this.inspectionMapper = inspectionMapper;
     }
 
     @Override
     @Transactional
-    public void initInspection(InspectionInitDTO inspectionInitDTO, Long partnerId) {
+    public InspectionResponseDTO initInspection(InspectionInitDTO inspectionInitDTO, Long partnerId) {
         Booking booking = bookingService.getEntityById(inspectionInitDTO.bookingId());
 
         vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), partnerId);
@@ -63,6 +67,8 @@ public class InspectionServiceImpl implements InspectionService {
         inspection.setInspectionDate(Instant.now());
 
         inspectionRepository.save(inspection);
+
+        return inspectionMapper.toResponseDTO(inspection);
     }
 
 
