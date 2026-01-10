@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/inspections")
 @PreAuthorize("hasRole('PARTNER')")
@@ -47,6 +49,32 @@ public class InspectionController {
             @PathVariable Long id,
             @RequestBody @Valid InspectionPatchDTO inspectionPatchDTO,
             @AuthenticationPrincipal Account account) {
-        return ResponseEntity.ok(inspectionService.updateById(id, inspectionPatchDTO));
+        Long partnerId = account.getId();
+        return ResponseEntity.ok(inspectionService.updateById(id, inspectionPatchDTO, partnerId));
     }
+
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<InspectionImageRespondeDTO>> getInspectionImagesById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account) {
+        Long partnerId = account.getId();
+        return ResponseEntity.ok(inspectionService.getInspectionImagesById(id, partnerId));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<InspectionResponseDTO> completeInspection(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account) {
+        Long partnerId = account.getId();
+        return ResponseEntity.ok(inspectionService.completeInspection(id, partnerId));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<InspectionResponseDTO> cancelInspection(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Account account) {
+        Long partnerId = account.getId();
+        return ResponseEntity.ok(inspectionService.cancelInspection(id, partnerId));
+    }
+
 }

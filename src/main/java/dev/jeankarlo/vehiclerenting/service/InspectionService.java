@@ -6,8 +6,13 @@ import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface InspectionService {
     InspectionResponseDTO initInspection(InspectionInitDTO inspectionInitDTO, Long partnerId);
     InspectionImageRespondeDTO uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId);
-    InspectionResponseDTO updateById(Long id, InspectionPatchDTO inspectionPatchDTO);
+    InspectionResponseDTO updateById(Long id, InspectionPatchDTO inspectionPatchDTO, Long partnerId) ;
+    List<InspectionImageRespondeDTO> getInspectionImagesById(Long inspectionId, Long partnerId);
+    InspectionResponseDTO completeInspection(Long id, Long partnerId);
+    InspectionResponseDTO cancelInspection(Long id, Long partnerId);
 }

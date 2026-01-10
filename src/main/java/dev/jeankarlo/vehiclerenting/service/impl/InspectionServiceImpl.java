@@ -20,11 +20,12 @@ import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.Bucket;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -53,6 +54,16 @@ public class InspectionServiceImpl implements InspectionService {
 
         vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), partnerId);
 
+        boolean existsInspectionOfType = inspectionRepository.existsByBookingAndTypeAndStatusNot(
+                booking,
+                inspectionInitDTO.type(),
+                InspectionStatus.CANCELLED
+        );
+
+        if(existsInspectionOfType) {
+            throw new BusinessException("Já existe uma inspeção do tipo " + inspectionInitDTO.type() + " para esta reserva.", HttpStatus.BAD_REQUEST);
+        }
+
         if (inspectionInitDTO.type().equals(InspectionType.PICK_UP) && booking.getStatus() != BookingStatus.CONFIRMED) {
             throw new BusinessException("A abertura de inspeção para retirada só pode ser feita em reservas confirmadas.", HttpStatus.BAD_REQUEST);
         }
@@ -60,6 +71,7 @@ public class InspectionServiceImpl implements InspectionService {
         if (inspectionInitDTO.type().equals(InspectionType.DROP_OFF) && booking.getStatus() != BookingStatus.ACTIVE) {
             throw new BusinessException("A abertura de inspeção para devolução só pode ser feita em reservas ativas.", HttpStatus.BAD_REQUEST);
         }
+
 
         Inspection inspection = new Inspection();
         inspection.setBooking(booking);
@@ -75,12 +87,16 @@ public class InspectionServiceImpl implements InspectionService {
 
     @Override
     public InspectionImageRespondeDTO uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId) {
-        Inspection inspection = inspectionRepository.findById(inspectionId)
-                .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
+        Inspection inspection = getInspectionEntityById(inspectionId);
 
-        String key = "inspections/" + inspectionId + "/" + UUID.randomUUID() + ".pdf";
+        validatePartnerOwnership(partnerId, inspection);
 
-        String url = fileStorageService.upload(BucketType.INSPECTIONS, String.valueOf(inspection.getId()), file);
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if (extension == null) extension = "jpg";
+
+        String key = "inspections/" + inspectionId + "/" + UUID.randomUUID() + "." + extension;
+
+        String url = fileStorageService.upload(BucketType.INSPECTIONS, key, file);
 
         InspectionImage inspectionImage = new InspectionImage();
         inspectionImage.setFileKey(key);
@@ -94,17 +110,77 @@ public class InspectionServiceImpl implements InspectionService {
         );
     }
 
+    @Override
+    public List<InspectionImageRespondeDTO> getInspectionImagesById(Long inspectionId, Long partnerId) {
+        Inspection inspection = getInspectionEntityById(inspectionId);
+        validatePartnerOwnership(partnerId, inspection);
+
+        List<InspectionImage> images = inspectionImageRepository.findByInspection(inspection);
+
+        return images.stream()
+                .map(image -> {
+                    String url = fileStorageService.getUrl(BucketType.INSPECTIONS, image.getFileKey());
+                    return new InspectionImageRespondeDTO(image.getId(), url);
+                })
+                .toList();
+    }
 
     @Override
     @Transactional
-    public InspectionResponseDTO updateById(Long id, InspectionPatchDTO inspectionPatchDTO) {
-        Inspection inspection = inspectionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
+    public InspectionResponseDTO updateById(Long id, InspectionPatchDTO inspectionPatchDTO, Long partnerId) {
+        Inspection inspection = getInspectionEntityById(id);
+
+        validatePartnerOwnership(partnerId, inspection);
+
+        if(inspection.getStatus() != InspectionStatus.PENDING) {
+            throw new BusinessException("Apenas inspeções com status PENDENTE podem ser atualizadas.", HttpStatus.BAD_REQUEST);
+        }
 
         inspectionMapper.updateInspection(inspection, inspectionPatchDTO);
 
         inspectionRepository.save(inspection);
-
         return inspectionMapper.toResponseDTO(inspection);
+    }
+
+    @Override
+    public InspectionResponseDTO completeInspection(Long id, Long partnerId) {
+        Inspection inspection = getInspectionEntityById(id);
+
+        validatePartnerOwnership(partnerId, inspection);
+
+        if(inspection.getStatus() != InspectionStatus.PENDING) {
+            throw new BusinessException("Apenas inspeções com status PENDENTE podem ser concluídas.", HttpStatus.BAD_REQUEST);
+        }
+
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        inspectionRepository.save(inspection);
+        return inspectionMapper.toResponseDTO(inspection);
+    }
+
+    @Override
+    public  InspectionResponseDTO cancelInspection(Long id, Long partnerId) {
+        Inspection inspection = getInspectionEntityById(id);
+
+        validatePartnerOwnership(partnerId, inspection);
+
+        if(inspection.getStatus() != InspectionStatus.PENDING) {
+            throw new BusinessException("Apenas inspeções com status PENDENTE podem ser canceladas.", HttpStatus.BAD_REQUEST);
+        }
+
+        inspection.setStatus(InspectionStatus.CANCELLED);
+        inspectionRepository.save(inspection);
+        return inspectionMapper.toResponseDTO(inspection);
+    }
+
+    private Inspection getInspectionEntityById(Long id) {
+        return inspectionRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
+    }
+
+    private void validatePartnerOwnership(Long partnerId, Inspection inspection) {
+        Long ownerId = inspection.getBooking().getVehicle().getPartner().getId();
+        if (!ownerId.equals(partnerId)) {
+            throw new BusinessException("A inspeção não pertence ao parceiro autenticado.", HttpStatus.FORBIDDEN);
+        }
     }
 }
