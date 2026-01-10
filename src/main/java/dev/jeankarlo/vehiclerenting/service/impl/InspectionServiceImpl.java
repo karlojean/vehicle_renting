@@ -2,6 +2,7 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 
 import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;
@@ -91,5 +92,19 @@ public class InspectionServiceImpl implements InspectionService {
                 inspectionImage.getId(),
                 url
         );
+    }
+
+
+    @Override
+    @Transactional
+    public InspectionResponseDTO updateById(Long id, InspectionPatchDTO inspectionPatchDTO) {
+        Inspection inspection = inspectionRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
+
+        inspectionMapper.updateInspection(inspection, inspectionPatchDTO);
+
+        inspectionRepository.save(inspection);
+
+        return inspectionMapper.toResponseDTO(inspection);
     }
 }

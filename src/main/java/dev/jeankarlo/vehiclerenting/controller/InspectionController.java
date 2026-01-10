@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.controller;
 
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
@@ -39,5 +40,13 @@ public class InspectionController {
             @AuthenticationPrincipal Account account) {
         Long partnerId = account.getId();
         return ResponseEntity.ok(inspectionService.uploadInspectionImage(id, file, partnerId));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<InspectionResponseDTO> update(
+            @PathVariable Long id,
+            @RequestBody @Valid InspectionPatchDTO inspectionPatchDTO,
+            @AuthenticationPrincipal Account account) {
+        return ResponseEntity.ok(inspectionService.updateById(id, inspectionPatchDTO));
     }
 }

@@ -7,6 +7,13 @@ import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 public record InspectionResponseDTO (
         Long id,
         InspectionStatus status,
-        InspectionType type
+        InspectionType type,
+        Integer odometerReading,
+        Integer fuelLevel,
+        Boolean isCleanExterior,
+        Boolean isCleanInterior,
+        Boolean hasSmokeSmell,
+        Boolean hasSpareTire,
+        Boolean hasDocuments
 ) {
 }
