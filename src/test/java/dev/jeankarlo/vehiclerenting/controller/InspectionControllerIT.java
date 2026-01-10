@@ -2,15 +2,11 @@ package dev.jeankarlo.vehiclerenting.controller;
 
 import dev.jeankarlo.vehiclerenting.BaseAuthenticatedTest;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
-import dev.jeankarlo.vehiclerenting.entity.Account;
-import dev.jeankarlo.vehiclerenting.entity.Booking;
-import dev.jeankarlo.vehiclerenting.entity.Location;
-import dev.jeankarlo.vehiclerenting.entity.Vehicle;
-import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
-import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
-import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
-import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
+import dev.jeankarlo.vehiclerenting.entity.*;
+import dev.jeankarlo.vehiclerenting.entity.enums.*;
 import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
+import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
 import dev.jeankarlo.vehiclerenting.repository.LocationRepository;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+
+
 
 public class InspectionControllerIT extends BaseAuthenticatedTest {
 
@@ -33,6 +32,8 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     private BookingRepository bookingRepository;
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    private InspectionRepository inspectionRepository;
 
     @Test
     @DisplayName("Should init pick-up inspection when booking is confirmed")
@@ -54,13 +55,13 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.PICK_UP);
 
         given()
-            .header("Authorization", "Bearer " + partnerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
-        .then()
-            .statusCode(200);
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(200);
     }
 
     @Test
@@ -81,13 +82,13 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.PICK_UP);
 
         given()
-            .header("Authorization", "Bearer " + partnerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
-        .then()
-            .statusCode(400);
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(400);
     }
 
     @Test
@@ -110,13 +111,13 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.DROP_OFF);
 
         given()
-            .header("Authorization", "Bearer " + partnerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
-        .then()
-            .statusCode(200);
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(200);
     }
 
     @Test
@@ -137,13 +138,13 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.DROP_OFF);
 
         given()
-            .header("Authorization", "Bearer " + partnerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
-        .then()
-            .statusCode(400);
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(400);
     }
 
     @Test
@@ -167,13 +168,13 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.PICK_UP);
 
         given()
-            .header("Authorization", "Bearer " + partnerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
-        .then()
-            .statusCode(404);
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(404);
     }
 
     @Test
@@ -196,13 +197,66 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         InspectionInitDTO inspectionInitDTO = new InspectionInitDTO(booking.getId(), InspectionType.PICK_UP);
 
         given()
-            .header("Authorization", "Bearer " + customerToken)
-            .contentType("application/json")
-            .body(inspectionInitDTO)
-        .when()
-            .post("/inspections")
+                .header("Authorization", "Bearer " + customerToken)
+                .contentType("application/json")
+                .body(inspectionInitDTO)
+                .when()
+                .post("/inspections")
+                .then()
+                .statusCode(403);
+    }
+
+
+    @Test
+    @DisplayName("Should update inspection successfully")
+    void shouldUpdateInspectionSuccessfully() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsCustomer();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        InspectionPatchDTO inspectionPatchDTO = new InspectionPatchDTO(
+                15000,
+                80,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .contentType("application/json")
+        .body(inspectionPatchDTO)
+                .when()
+                .patch("/inspections/" + inspection.getId())
         .then()
-            .statusCode(403);
+                .statusCode(200)
+                .body("odometerReading", equalTo(15000))
+                .body("fuelLevel", equalTo(80))
+                .body("isCleanExterior", nullValue())
+                .body("isCleanInterior", nullValue())
+                .body("hasSmokeSmell", nullValue())
+                .body("hasSpareTire", nullValue())
+                .body("hasDocuments", nullValue());
     }
 
     private Location createAndSaveLocation(Account partner) {
@@ -242,7 +296,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         booking.setStatus(BookingStatus.PENDING);
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
-        booking.setTotalPriceCents( (endDate.toEpochDay() - startDate.toEpochDay() + 1) * vehicle.getPricePerDayCents());
+        booking.setTotalPriceCents((endDate.toEpochDay() - startDate.toEpochDay() + 1) * vehicle.getPricePerDayCents());
         return bookingRepository.save(booking);
     }
 }
