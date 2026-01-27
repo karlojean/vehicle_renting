@@ -15,4 +15,5 @@ public interface InspectionService {
     List<InspectionImageRespondeDTO> getInspectionImagesById(Long inspectionId, Long partnerId);
     InspectionResponseDTO completeInspection(Long id, Long partnerId);
     InspectionResponseDTO cancelInspection(Long id, Long partnerId);
+    List<InspectionResponseDTO> getInspectionsByBookingId(Long bookingId, Long partnerId);
 }

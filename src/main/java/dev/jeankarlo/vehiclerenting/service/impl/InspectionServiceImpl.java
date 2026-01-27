@@ -86,6 +86,7 @@ public class InspectionServiceImpl implements InspectionService {
 
 
     @Override
+    @Transactional
     public InspectionImageRespondeDTO uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId) {
         Inspection inspection = getInspectionEntityById(inspectionId);
 
@@ -111,6 +112,7 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Override
+    @Transactional
     public List<InspectionImageRespondeDTO> getInspectionImagesById(Long inspectionId, Long partnerId) {
         Inspection inspection = getInspectionEntityById(inspectionId);
         validatePartnerOwnership(partnerId, inspection);
@@ -143,6 +145,7 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Override
+    @Transactional
     public InspectionResponseDTO completeInspection(Long id, Long partnerId) {
         Inspection inspection = getInspectionEntityById(id);
 
@@ -158,6 +161,7 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Override
+    @Transactional
     public  InspectionResponseDTO cancelInspection(Long id, Long partnerId) {
         Inspection inspection = getInspectionEntityById(id);
 
@@ -170,6 +174,19 @@ public class InspectionServiceImpl implements InspectionService {
         inspection.setStatus(InspectionStatus.CANCELLED);
         inspectionRepository.save(inspection);
         return inspectionMapper.toResponseDTO(inspection);
+    }
+
+    @Override
+    public List<InspectionResponseDTO> getInspectionsByBookingId(Long bookingId, Long partnerId) {
+        Booking booking = bookingService.getEntityById(bookingId);
+
+        vehicleService.findVehicleByOwnerOrThrow(booking.getVehicle().getId(), partnerId);
+
+        List<Inspection> inspections = inspectionRepository.findByBooking(booking);
+
+        return inspections.stream()
+                .map(inspectionMapper::toResponseDTO)
+                .toList();
     }
 
     private Inspection getInspectionEntityById(Long id) {

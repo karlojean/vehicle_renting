@@ -77,4 +77,12 @@ public class InspectionController {
         return ResponseEntity.ok(inspectionService.cancelInspection(id, partnerId));
     }
 
+    @GetMapping
+    public ResponseEntity<List<InspectionResponseDTO>> getInspectionByBookingId(
+            @RequestParam Long bookingId,
+            @AuthenticationPrincipal Account account) {
+        Long partnerId = account.getId();
+        return ResponseEntity.ok(inspectionService.getInspectionsByBookingId(bookingId, partnerId));
+    }
+
 }
