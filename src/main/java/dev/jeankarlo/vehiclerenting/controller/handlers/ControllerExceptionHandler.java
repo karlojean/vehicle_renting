@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,11 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> database(DataIntegrityViolationException e, HttpServletRequest request) {
+
+        if (e.getMessage().contains("no_booking_overlap")) {
+            return buildErrorResponse(HttpStatus.CONFLICT, "Conflito de agendamento: o veículo já está reservado para o período solicitado", request);
+        }
+
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Violação de integridade de dados", request);
     }
 
