@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
 import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
+import dev.jeankarlo.vehiclerenting.exception.StorageException;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,11 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.io.InputStream;
 import java.time.Duration;
 
 @Service
@@ -38,56 +42,46 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String upload(BucketType bucketType, String key, MultipartFile file) {
+    public String uploadFile(String path, InputStream inputStream, String contentType, long length, BucketType bucketType) {
         try {
-            s3Client.putObject(
-                    PutObjectRequest.builder()
-                            .bucket(bucketType.getBucketName())
-                            .key(key)
-                            .contentType(file.getContentType())
-                            .build(),
-                    RequestBody.fromBytes(file.getBytes())
-            );
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketType.getBucketName())
+                    .key(path)
+                    .contentType(contentType)
+                    .build();
 
-            return getUrl(bucketType, key);
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, length));
+            return path;
 
         } catch (Exception e) {
-            throw new RuntimeException("Falha no upload", e);
+            throw new StorageException();
         }
     }
 
     @Override
-    public String deleteFile(String fileUrl) {
-        return null;
-    }
-
-    @Override
-    public String getUrl(BucketType bucketType, String key) {
-
-        if(bucketType.isPublic()) {
-            return getPublicUrl(bucketType.getBucketName(), key);
-        }
-
-        return generateTemporaryURL(bucketType, key);
-    }
-
-    private String generateTemporaryURL(BucketType bucketType, String key) {
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(15))
-                .getObjectRequest(r -> r.bucket(bucketType.getBucketName()).key(key))
+    public String generatePresignedUrl(String storagePath, int expirationInMinutes, BucketType bucketType) {
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucketType.getBucketName())
+                .key(storagePath)
                 .build();
 
-        return s3Presigner.presignGetObject(presignRequest).url().toString();
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(expirationInMinutes))
+                .getObjectRequest(objectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+        return presignedRequest.url().toString();
     }
 
-    private String getPublicUrl(String bucket, String key) {
-        String baseUrl = endpointUrl.endsWith("/")
-                ? endpointUrl.substring(0, endpointUrl.length() - 1)
-                : endpointUrl;
+    @Override
+    public String getPublicUrl(String storagePath, BucketType bucketType){
+        return String.format("%s/%s/%s", endpointUrl, bucketType.getBucketName(), storagePath);
+    }
 
-        String cleanKey = key.startsWith("/") ? key.substring(1) : key;
-
-        return String.format("%s/%s/%s", baseUrl, bucket, cleanKey);
+    @Override
+    public void deleteFile(String storagePath, BucketType bucketType) {
+        s3Client.deleteObject(b -> b.bucket(bucketType.getBucketName()).key(storagePath));
     }
 
     private void createBucketIfNotExists(BucketType bucketType) {

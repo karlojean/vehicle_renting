@@ -1,18 +1,16 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
-import dev.jeankarlo.vehiclerenting.entity.Location;
-import dev.jeankarlo.vehiclerenting.entity.VehicleImage;
+import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.VehicleImageMapper;
-import dev.jeankarlo.vehiclerenting.repository.VehicleImageRepository;
-import dev.jeankarlo.vehiclerenting.service.FileStorageService;
-import dev.jeankarlo.vehiclerenting.service.LocationService;
+import dev.jeankarlo.vehiclerenting.repository.VehicleMediaRepository;
+import dev.jeankarlo.vehiclerenting.service.*;
 import dev.jeankarlo.vehiclerenting.specifications.VehicleSpec;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -24,12 +22,8 @@ import org.springframework.stereotype.Service;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
-import dev.jeankarlo.vehiclerenting.entity.Account;
-import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.mapper.VehicleMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
-import dev.jeankarlo.vehiclerenting.service.AccountService;
-import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -42,9 +36,11 @@ public class VehicleServiceImpl implements VehicleService {
     private final FileStorageService fileStorageService;
     private final VehicleImageRepository vehicleImageRepository;
     private final VehicleImageMapper vehicleImageMapper;
+    private final MediaAssetService mediaAssetService;
+    private final VehicleMediaRepository vehicleMediaRepository;
 
     public VehicleServiceImpl(VehicleMapper vehicleMapper, VehicleRepository vehicleRepository,
-                              AccountService accountService, LocationService locationService, FileStorageService fileStorageService, VehicleImageRepository vehicleImageRepository, VehicleImageMapper vehicleImageMapper) {
+                              AccountService accountService, LocationService locationService, FileStorageService fileStorageService, VehicleImageRepository vehicleImageRepository, VehicleImageMapper vehicleImageMapper, MediaAssetService mediaAssetService, VehicleMediaRepository vehicleMediaRepository) {
         this.vehicleMapper = vehicleMapper;
         this.vehicleRepository = vehicleRepository;
         this.accountService = accountService;
@@ -52,6 +48,8 @@ public class VehicleServiceImpl implements VehicleService {
         this.fileStorageService = fileStorageService;
         this.vehicleImageRepository = vehicleImageRepository;
         this.vehicleImageMapper = vehicleImageMapper;
+        this.mediaAssetService = mediaAssetService;
+        this.vehicleMediaRepository = vehicleMediaRepository;
     }
 
     @Override
@@ -116,21 +114,25 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @Transactional
     public VehicleImageResponseDTO uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file) {
         Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
 
-        String key = String.format("vehicles/%s/%s",
-                vehicleId, UUID.randomUUID());
+        try {
+            MediaAsset mediaAsset = mediaAssetService.uploadAndCreate(file, BucketType.VEHICLES);
+            VehicleMedia vehicleMedia = new VehicleMedia();
+            vehicleMedia.setVehicle(vehicle);
+            vehicleMedia.setMediaAssets(mediaAsset);
 
-        String url = fileStorageService.upload(BucketType.VEHICLES, key, file);
+            vehicleMediaRepository.save(vehicleMedia);
 
-        VehicleImage vehicleImage = new VehicleImage();
-        vehicleImage.setFileKey(key);
-        vehicleImage.setVehicle(vehicle);
+            String url = fileStorageService.getPublicUrl(mediaAsset.getStoragePath(), BucketType.VEHICLES);
 
-        vehicleImageRepository.save(vehicleImage);
-
-        return new VehicleImageResponseDTO(vehicleImage.getId(), url);
+            VehicleImageResponseDTO vehicleImage = new VehicleImageResponseDTO(vehicle.getId(), url);
+            return vehicleImage;
+        } catch (IOException e) {
+            throw new BusinessException("Erro ao fazer upload da imagem do veículo.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -140,10 +142,7 @@ public class VehicleServiceImpl implements VehicleService {
         List<VehicleImage> vehicleImages = vehicleImageRepository.findByVehicle(vehicle);
 
         return vehicleImages.stream().map(image -> {
-            String url = fileStorageService.getUrl(
-                    BucketType.VEHICLES,
-                    image.getFileKey()
-            );
+            String url = "refactor";
             return new VehicleImageResponseDTO(image.getId(), url);
         }).toList();
     }

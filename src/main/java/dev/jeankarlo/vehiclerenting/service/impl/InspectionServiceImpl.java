@@ -1,6 +1,5 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
-import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
@@ -11,7 +10,6 @@ import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.InspectionMapper;
-import dev.jeankarlo.vehiclerenting.repository.InspectionImageRepository;
 import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
@@ -24,7 +22,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,16 +94,10 @@ public class InspectionServiceImpl implements InspectionService {
 
         String key = "inspections/" + inspectionId + "/" + UUID.randomUUID() + "." + extension;
 
-        String url = fileStorageService.upload(BucketType.INSPECTIONS, key, file);
-
-        InspectionImage inspectionImage = new InspectionImage();
-        inspectionImage.setFileKey(key);
-        inspectionImage.setInspection(inspection);
-
-        inspectionImageRepository.save(inspectionImage);
+        String url = "refactor";
 
         return new InspectionImageRespondeDTO(
-                inspectionImage.getId(),
+                Integer.toUnsignedLong(1),
                 url
         );
     }
@@ -121,7 +112,7 @@ public class InspectionServiceImpl implements InspectionService {
 
         return images.stream()
                 .map(image -> {
-                    String url = fileStorageService.getUrl(BucketType.INSPECTIONS, image.getFileKey());
+                    String url = "refactor";
                     return new InspectionImageRespondeDTO(image.getId(), url);
                 })
                 .toList();

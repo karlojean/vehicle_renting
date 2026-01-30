@@ -2,21 +2,27 @@ package dev.jeankarlo.vehiclerenting.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "vehicle_image")
-public class VehicleImage {
+@Table(name = "vehicle_media")
+public class VehicleMedia {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+    @Column(name = "media_id", nullable = false)
+    private UUID id;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "media_id", nullable = false)
+    private MediaAsset mediaAssets;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -24,9 +30,5 @@ public class VehicleImage {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "file_key", nullable = false)
-    private String fileKey;
 
 }
