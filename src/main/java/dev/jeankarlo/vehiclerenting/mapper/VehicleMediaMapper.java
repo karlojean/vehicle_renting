@@ -15,19 +15,20 @@ public abstract class VehicleMediaMapper {
     @Autowired
     protected FileStorageService fileStorageService;
 
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "originalFilename", source = "mediaAssets.originalFilename")
     @Mapping(target = "contentType", source = "mediaAssets.contentType")
     @Mapping(target = "extension", source = "mediaAssets.extension")
-    @Mapping(target = "url", source = "vehicleImage", qualifiedByName = "resolveUrl")
-    public abstract VehicleMediaResponseDTO toResponseDTO(VehicleMedia vehicleImage);
+    @Mapping(target = "url", source = "vehicleMedia", qualifiedByName = "resolveUrl")
+    public abstract VehicleMediaResponseDTO toResponseDTO(VehicleMedia vehicleMedia);
 
     @Named("resolveUrl")
-    protected String resolveUrl(VehicleMedia vehicleImage) {
-        if (vehicleImage.getMediaAssets() == null) {
+    protected String resolveUrl(VehicleMedia vehicleMedia) {
+        if (vehicleMedia.getMediaAssets() == null) {
             return null;
         }
 
-        var media = vehicleImage.getMediaAssets();
+        var media = vehicleMedia.getMediaAssets();
         var bucketType = BucketType.VEHICLES;
         var path = media.getStoragePath();
 
