@@ -25,9 +25,6 @@ logging:
 jwt.secret: ${JWT_SECRET:mydevsecretkey}
 
 aws.s3:
-  bucket:
-    vehicle: ${AWS_S3_VEHICLE_BUCKET:dev-vehicle}
-    inspection: ${AWS_S3_INSPECTION_BUCKET:dev-inspection}
   region: ${AWS_REGION:us-east-1}
   access-key: ${AWS_ACCESS_KEY:dev-access-key}
   secret-key: ${AWS_SECRET_KEY:dev-secret-key}
