@@ -1,15 +1,10 @@
 package dev.jeankarlo.vehiclerenting.service.impl;
 
-import java.io.IOException;
 import java.util.List;
 
-import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
-import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.exception.BusinessException;
-import dev.jeankarlo.vehiclerenting.mapper.VehicleImageMapper;
-import dev.jeankarlo.vehiclerenting.repository.VehicleMediaRepository;
 import dev.jeankarlo.vehiclerenting.service.*;
 import dev.jeankarlo.vehiclerenting.specifications.VehicleSpec;
 import jakarta.transaction.Transactional;
@@ -24,7 +19,6 @@ import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.mapper.VehicleMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -33,23 +27,13 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final AccountService accountService;
     private final LocationService locationService;
-    private final FileStorageService fileStorageService;
-    private final VehicleImageRepository vehicleImageRepository;
-    private final VehicleImageMapper vehicleImageMapper;
-    private final MediaAssetService mediaAssetService;
-    private final VehicleMediaRepository vehicleMediaRepository;
 
     public VehicleServiceImpl(VehicleMapper vehicleMapper, VehicleRepository vehicleRepository,
-                              AccountService accountService, LocationService locationService, FileStorageService fileStorageService, VehicleImageRepository vehicleImageRepository, VehicleImageMapper vehicleImageMapper, MediaAssetService mediaAssetService, VehicleMediaRepository vehicleMediaRepository) {
+                              AccountService accountService, LocationService locationService) {
         this.vehicleMapper = vehicleMapper;
         this.vehicleRepository = vehicleRepository;
         this.accountService = accountService;
         this.locationService = locationService;
-        this.fileStorageService = fileStorageService;
-        this.vehicleImageRepository = vehicleImageRepository;
-        this.vehicleImageMapper = vehicleImageMapper;
-        this.mediaAssetService = mediaAssetService;
-        this.vehicleMediaRepository = vehicleMediaRepository;
     }
 
     @Override
@@ -111,40 +95,6 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle findVehicleByOwnerOrThrow(Long id, Long partnerId) {
         return vehicleRepository.findByIdAndPartner_Id(id, partnerId)
                 .orElseThrow(() -> new BusinessException("Veiculo não encontrado ou não pertence ao usuário.", HttpStatus.NOT_FOUND));
-    }
-
-    @Override
-    @Transactional
-    public VehicleImageResponseDTO uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
-
-        try {
-            MediaAsset mediaAsset = mediaAssetService.uploadAndCreate(file, BucketType.VEHICLES);
-            VehicleMedia vehicleMedia = new VehicleMedia();
-            vehicleMedia.setVehicle(vehicle);
-            vehicleMedia.setMediaAssets(mediaAsset);
-
-            vehicleMediaRepository.save(vehicleMedia);
-
-            String url = fileStorageService.getPublicUrl(mediaAsset.getStoragePath(), BucketType.VEHICLES);
-
-            VehicleImageResponseDTO vehicleImage = new VehicleImageResponseDTO(vehicle.getId(), url);
-            return vehicleImage;
-        } catch (IOException e) {
-            throw new BusinessException("Erro ao fazer upload da imagem do veículo.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Override
-    public List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long partnerId) {
-        Vehicle vehicle = findVehicleByOwnerOrThrow(vehicleId, partnerId);
-
-        List<VehicleImage> vehicleImages = vehicleImageRepository.findByVehicle(vehicle);
-
-        return vehicleImages.stream().map(image -> {
-            String url = "refactor";
-            return new VehicleImageResponseDTO(image.getId(), url);
-        }).toList();
     }
 
     @Override

@@ -3,14 +3,12 @@ package dev.jeankarlo.vehiclerenting.service;
 import java.util.List;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
-import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
 import org.springframework.data.domain.Pageable;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehiclePatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface VehicleService {
     VehicleResponseDTO create(Long id, VehicleRequestDTO vehicleCreateDTO);
@@ -28,10 +26,6 @@ public interface VehicleService {
     void activate(Long id, Long partnerId);
 
     Vehicle findVehicleByOwnerOrThrow(Long id, Long partnerId);
-
-    VehicleImageResponseDTO uploadVehicleImage(Long vehicleId, Long partnerId, MultipartFile file);
-
-    List<VehicleImageResponseDTO> getVehicleImages(Long vehicleId, Long partnerId);
 
     Vehicle getEntityById(Long vehicleId);
 

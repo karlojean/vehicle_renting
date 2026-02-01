@@ -79,7 +79,4 @@ public class Vehicle {
     @CreationTimestamp
     private Instant createdAt;
 
-    @OneToMany(mappedBy = "vehicle")
-    private Set<VehicleImage> vehicleImages = new LinkedHashSet<>();
-
 }

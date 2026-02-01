@@ -19,7 +19,7 @@ public class VehicleMedia {
     private UUID id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "media_id", nullable = false)
     private MediaAsset mediaAssets;

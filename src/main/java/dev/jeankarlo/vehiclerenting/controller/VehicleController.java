@@ -3,7 +3,8 @@ package dev.jeankarlo.vehiclerenting.controller;
 import java.util.List;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
-import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleImage.VehicleImageResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleMedia.VehicleMediaResponseDTO;
+import dev.jeankarlo.vehiclerenting.service.VehicleMediaService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,9 +36,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class VehicleController {
 
     private final VehicleService vehicleService;
+    private final VehicleMediaService vehicleMediaService;
 
-    public VehicleController(VehicleService vehicleService) {
+    public VehicleController(VehicleService vehicleService, VehicleMediaService vehicleMediaService) {
         this.vehicleService = vehicleService;
+        this.vehicleMediaService = vehicleMediaService;
     }
 
     @PostMapping
@@ -112,20 +115,20 @@ public class VehicleController {
 
     @PostMapping("/{id}/images")
     @PreAuthorize("hasRole('PARTNER')")
-    public ResponseEntity<VehicleImageResponseDTO> uploadVehicleImage(
+    public ResponseEntity<VehicleMediaResponseDTO> uploadVehicleImage(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal Account account) {
-        return ResponseEntity.ok(vehicleService.uploadVehicleImage(id, account.getId(), file));
+        return ResponseEntity.ok(vehicleMediaService.uploadMedia(id, account.getId(), file));
     }
 
     @GetMapping("/{id}/images")
     @PreAuthorize("hasRole('PARTNER')")
-    public ResponseEntity<List<VehicleImageResponseDTO>> getVehicleImage(
+    public ResponseEntity<List<VehicleMediaResponseDTO>> getVehicleMedias(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
         Long ownerId = account.getId();
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleService.getVehicleImages(id, ownerId));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleMediaService.getVehicleMedias(id, ownerId));
     }
 
     @GetMapping("/available")

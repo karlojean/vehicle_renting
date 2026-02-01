@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,6 +36,8 @@ public class MediaAssetServiceImpl implements MediaAssetService {
         mediaAsset.setOriginalFilename(file.getOriginalFilename());
         mediaAsset.setContentType(file.getContentType());
         mediaAsset.setFileSizeInBytes(file.getSize());
+        mediaAsset.setExtension(getExtensionByFilename(file.getOriginalFilename()));
+
 
         if(bucketType.isPublic()) {
             mediaAsset.setAccessLevel("PUBLIC");
@@ -47,12 +48,20 @@ public class MediaAssetServiceImpl implements MediaAssetService {
         return mediaAssetRepository.save(mediaAsset);
     }
 
+
     private InputStream getInputStream(MultipartFile file)  {
         try {
             return file.getInputStream();
         } catch (IOException ioException) {
             throw new BusinessException("Falha ao processar o arquivo.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String getExtensionByFilename(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return "";
+        }
+        return filename.substring(filename.lastIndexOf(".") + 1);
     }
 
 

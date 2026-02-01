@@ -32,15 +32,13 @@ public class InspectionServiceImpl implements InspectionService {
     private final VehicleService vehicleService;
     private final InspectionRepository inspectionRepository;
     private final FileStorageService fileStorageService;
-    private final InspectionImageRepository inspectionImageRepository;
     private final InspectionMapper inspectionMapper;
 
-    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService, InspectionImageRepository inspectionImageRepository, InspectionMapper inspectionMapper) {
+    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService,  InspectionMapper inspectionMapper) {
         this.bookingService = bookingService;
         this.vehicleService = vehicleService;
         this.inspectionRepository = inspectionRepository;
         this.fileStorageService = fileStorageService;
-        this.inspectionImageRepository = inspectionImageRepository;
         this.inspectionMapper = inspectionMapper;
     }
 
@@ -100,22 +98,6 @@ public class InspectionServiceImpl implements InspectionService {
                 Integer.toUnsignedLong(1),
                 url
         );
-    }
-
-    @Override
-    @Transactional
-    public List<InspectionImageRespondeDTO> getInspectionImagesById(Long inspectionId, Long partnerId) {
-        Inspection inspection = getInspectionEntityById(inspectionId);
-        validatePartnerOwnership(partnerId, inspection);
-
-        List<InspectionImage> images = inspectionImageRepository.findByInspection(inspection);
-
-        return images.stream()
-                .map(image -> {
-                    String url = "refactor";
-                    return new InspectionImageRespondeDTO(image.getId(), url);
-                })
-                .toList();
     }
 
     @Override
