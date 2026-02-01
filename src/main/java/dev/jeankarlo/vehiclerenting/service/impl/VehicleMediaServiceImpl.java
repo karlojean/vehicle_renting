@@ -11,6 +11,7 @@ import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.MediaAssetService;
 import dev.jeankarlo.vehiclerenting.service.VehicleMediaService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,7 @@ public class VehicleMediaServiceImpl implements VehicleMediaService {
     }
 
     @Override
+    @Transactional
     public VehicleMediaResponseDTO uploadMedia(Long vehicleId, Long partnerId, MultipartFile file) {
         Vehicle vehicle = vehicleService.findVehicleByOwnerOrThrow(vehicleId, partnerId);
         MediaAsset mediaAsset = mediaAssetService.uploadAndCreate(file, BucketType.VEHICLES);
