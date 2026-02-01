@@ -46,7 +46,7 @@ public class VehicleMediaServiceImpl implements VehicleMediaService {
     }
 
     @Override
-    public List<VehicleMediaResponseDTO> getVehicleMedias(Long vehicleId, Long partnerId) {
+    public List<VehicleMediaResponseDTO> getVehicleMedias(Long vehicleId) {
         Vehicle vehicle = vehicleService.getEntityById(vehicleId);
 
         var vehicleMedias = vehicleMediaRepository.findAllByVehicle(vehicle);

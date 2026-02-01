@@ -123,12 +123,10 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}/images")
-    @PreAuthorize("hasRole('PARTNER')")
     public ResponseEntity<List<VehicleMediaResponseDTO>> getVehicleMedias(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
-        Long ownerId = account.getId();
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleMediaService.getVehicleMedias(id, ownerId));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleMediaService.getVehicleMedias(id));
     }
 
     @GetMapping("/available")

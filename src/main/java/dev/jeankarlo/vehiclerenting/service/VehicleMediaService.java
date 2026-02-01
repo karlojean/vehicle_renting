@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface VehicleMediaService {
     VehicleMediaResponseDTO uploadMedia(Long vehicleId, Long partnerId, MultipartFile file);
-    List<VehicleMediaResponseDTO> getVehicleMedias(Long vehicleId, Long partnerId);
+    List<VehicleMediaResponseDTO> getVehicleMedias(Long vehicleId);
 }
