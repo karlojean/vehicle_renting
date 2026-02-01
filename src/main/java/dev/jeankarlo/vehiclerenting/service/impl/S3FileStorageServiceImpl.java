@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
@@ -27,7 +28,10 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     private final S3Presigner s3Presigner;
 
     @Value("${aws.s3.endpoint}")
-    private String endpointUrl;
+    private String endpoint;
+
+    @Value("${aws.s3.region}")
+    private String region;
 
     public S3FileStorageServiceImpl(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
@@ -75,8 +79,15 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String getPublicUrl(String storagePath, BucketType bucketType){
-        return String.format("%s/%s/%s", endpointUrl, bucketType.getBucketName(), storagePath);
+    public String getPublicUrl(String storagePath, BucketType bucketType) {
+        if (endpoint != null && !endpoint.isEmpty()) {
+            return String.format("%s/%s/%s", endpoint, bucketType.getBucketName(), storagePath);
+        }
+
+        return String.format("https://%s.s3.%s.amazonaws.com/%s",
+                bucketType.getBucketName(),
+                Region.of(region).id(),
+                storagePath);
     }
 
     @Override
