@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE media_assets
+CREATE TABLE media_asset
 (
     id                 UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     storage_path       VARCHAR(500) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE vehicle_media
     media_id   UUID PRIMARY KEY,
     vehicle_id BIGINT NOT NULL,
 
-    CONSTRAINT fk_vehicle_media_asset FOREIGN KEY (media_id) REFERENCES media_assets (id) ON DELETE CASCADE,
+    CONSTRAINT fk_vehicle_media_asset FOREIGN KEY (media_id) REFERENCES media_asset (id) ON DELETE CASCADE,
     CONSTRAINT fk_vehicle_media_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE
 );
 
@@ -29,6 +29,6 @@ CREATE TABLE inspection_media
     media_id      UUID PRIMARY KEY,
     inspection_id BIGINT NOT NULL,
 
-    CONSTRAINT fk_inspection_media_asset FOREIGN KEY (media_id) REFERENCES media_assets (id) ON DELETE CASCADE,
+    CONSTRAINT fk_inspection_media_asset FOREIGN KEY (media_id) REFERENCES media_asset (id) ON DELETE CASCADE,
     CONSTRAINT fk_inspection_media_inspection FOREIGN KEY (inspection_id) REFERENCES inspection (id) ON DELETE CASCADE
 );

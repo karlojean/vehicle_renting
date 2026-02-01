@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "media_assets")
+@Table(name = "media_asset")
 public class MediaAsset {
     @Id
     @ColumnDefault("gen_random_uuid()")

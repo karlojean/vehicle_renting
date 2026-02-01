@@ -75,6 +75,9 @@ public class Vehicle {
     @JoinColumn(name = "partner_id", nullable = false)
     private Account partner;
 
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VehicleMedia> mediaAssets = new LinkedHashSet<>();
+
     @Column(name = "created_at")
     @CreationTimestamp
     private Instant createdAt;

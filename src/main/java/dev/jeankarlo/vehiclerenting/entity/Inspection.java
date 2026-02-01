@@ -10,6 +10,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -69,5 +71,8 @@ public class Inspection {
     @ColumnDefault("true")
     @Column(name = "has_documents")
     private Boolean hasDocuments;
+
+    @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<InspectionMedia> mediaAssets = new LinkedHashSet<>();
 
 }
