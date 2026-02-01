@@ -81,5 +81,4 @@ public class Vehicle {
     @Column(name = "created_at")
     @CreationTimestamp
     private Instant createdAt;
-
 }

@@ -18,17 +18,15 @@ public class VehicleMedia {
     @Column(name = "media_id", nullable = false)
     private UUID id;
 
-    @MapsId
     @OneToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "media_id", nullable = false)
-    private MediaAsset mediaAssets;
+    @MapsId
+    private MediaAsset mediaAsset;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
-
-
 }

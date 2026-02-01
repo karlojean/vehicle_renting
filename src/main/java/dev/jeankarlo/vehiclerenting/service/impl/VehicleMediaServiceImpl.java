@@ -40,7 +40,7 @@ public class VehicleMediaServiceImpl implements VehicleMediaService {
 
         VehicleMedia vehicleMedia = new VehicleMedia();
         vehicleMedia.setVehicle(vehicle);
-        vehicleMedia.setMediaAssets(mediaAsset);
+        vehicleMedia.setMediaAsset(mediaAsset);
 
         return vehicleMediaMapper.toResponseDTO(vehicleMediaRepository.save(vehicleMedia));
     }
