@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Service
 public class MediaAssetServiceImpl implements MediaAssetService {
@@ -26,7 +27,7 @@ public class MediaAssetServiceImpl implements MediaAssetService {
 
     @Override
     public MediaAsset uploadAndCreate(MultipartFile file, BucketType bucketType) {
-        String path = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String path = UUID.randomUUID() + "/" + file.getOriginalFilename();
 
         path = fileStorageService.uploadFile(path, getInputStream(file), file.getContentType(), file.getSize(), bucketType);
 
