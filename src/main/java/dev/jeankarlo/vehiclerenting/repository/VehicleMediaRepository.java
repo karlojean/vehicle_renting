@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface VehicleMediaRepository extends JpaRepository<VehicleMedia, UUID> {
 
     List<VehicleMedia> findAllByVehicle(Vehicle vehicle);
+    int countByVehicle(Vehicle vehicle);
 
 }

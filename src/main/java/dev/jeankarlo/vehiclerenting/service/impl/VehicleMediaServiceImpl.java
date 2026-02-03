@@ -5,6 +5,7 @@ import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleMedia.VehicleMediaRespons
 import dev.jeankarlo.vehiclerenting.entity.MediaAsset;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.entity.VehicleMedia;
+import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.VehicleMediaMapper;
 import dev.jeankarlo.vehiclerenting.repository.VehicleMediaRepository;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
@@ -12,6 +13,7 @@ import dev.jeankarlo.vehiclerenting.service.MediaAssetService;
 import dev.jeankarlo.vehiclerenting.service.VehicleMediaService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,24 +22,41 @@ import java.util.List;
 @Service
 public class VehicleMediaServiceImpl implements VehicleMediaService {
 
+     private static final List<String> ALLOWED_MEDIA_TYPES = List.of(
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "video/mp4",
+            "video/mpeg"
+    );
+
     private final VehicleService vehicleService;
     private final MediaAssetService mediaAssetService;
     private final VehicleMediaRepository vehicleMediaRepository;
     private final VehicleMediaMapper vehicleMediaMapper;
-    private final FileStorageService fileStorageService;
 
-    public VehicleMediaServiceImpl(VehicleService vehicleService, MediaAssetService mediaAssetService, VehicleMediaRepository vehicleMediaRepository, VehicleMediaMapper vehicleMediaMapper, FileStorageService fileStorageService) {
+    public VehicleMediaServiceImpl(VehicleService vehicleService, MediaAssetService mediaAssetService, VehicleMediaRepository vehicleMediaRepository, VehicleMediaMapper vehicleMediaMapper) {
         this.vehicleService = vehicleService;
         this.mediaAssetService = mediaAssetService;
         this.vehicleMediaRepository = vehicleMediaRepository;
         this.vehicleMediaMapper = vehicleMediaMapper;
-        this.fileStorageService = fileStorageService;
     }
 
     @Override
     @Transactional
     public VehicleMediaResponseDTO uploadMedia(Long vehicleId, Long partnerId, MultipartFile file) {
+
+        if(!ALLOWED_MEDIA_TYPES.contains(file.getContentType())) {
+            throw new BusinessException("Tipo de mídia não suportado.", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        }
+
         Vehicle vehicle = vehicleService.findVehicleByOwnerOrThrow(vehicleId, partnerId);
+
+        if(vehicleMediaRepository.countByVehicle(vehicle) > 10) {
+            throw new BusinessException("Número máximo de mídias atingido para este veículo.", HttpStatus.BAD_REQUEST);
+        }
+
+
         MediaAsset mediaAsset = mediaAssetService.uploadAndCreate(file, BucketType.VEHICLES);
 
         VehicleMedia vehicleMedia = new VehicleMedia();
