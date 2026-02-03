@@ -5,11 +5,12 @@ import dev.jeankarlo.vehiclerenting.entity.VehicleMedia;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface VehicleMediaRepository extends JpaRepository<VehicleMedia, UUID> {
 
     List<VehicleMedia> findAllByVehicle(Vehicle vehicle);
     int countByVehicle(Vehicle vehicle);
-
+    Optional<VehicleMedia> findByIdAndVehicle(UUID id, Vehicle vehicle);
 }

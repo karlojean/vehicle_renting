@@ -11,4 +11,13 @@ public enum BucketType {
 
     private final String bucketName;
     private final boolean isPublic;
+
+    public static BucketType fromBucketName(String bucketName) {
+        for (BucketType bucketType : BucketType.values()) {
+            if (bucketType.getBucketName().equals(bucketName)) {
+                return bucketType;
+            }
+        }
+        throw new IllegalArgumentException("Erro ao encontrar o bucket " + bucketName);
+    }
 }

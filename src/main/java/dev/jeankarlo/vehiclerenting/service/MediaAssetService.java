@@ -4,6 +4,9 @@ import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
 import dev.jeankarlo.vehiclerenting.entity.MediaAsset;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 public interface MediaAssetService {
     MediaAsset uploadAndCreate(MultipartFile file, BucketType bucketType);
+    void deleteFromStorageAndRepository(UUID mediaAssetId);
 }

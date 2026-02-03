@@ -6,6 +6,7 @@ import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.repository.MediaAssetRepository;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.MediaAssetService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +50,16 @@ public class MediaAssetServiceImpl implements MediaAssetService {
         return mediaAssetRepository.save(mediaAsset);
     }
 
+    @Override
+    @Transactional
+    public void deleteFromStorageAndRepository(UUID mediaAssetId) {
+        MediaAsset mediaAsset = mediaAssetRepository.findById(mediaAssetId)
+                .orElseThrow(() -> new BusinessException("Mídia não encontrada.", HttpStatus.NOT_FOUND));
+
+        fileStorageService.deleteFile(mediaAsset.getStoragePath(), BucketType.fromBucketName(mediaAsset.getBucketName()));
+
+        mediaAssetRepository.delete(mediaAsset);
+    }
 
     private InputStream getInputStream(MultipartFile file)  {
         try {

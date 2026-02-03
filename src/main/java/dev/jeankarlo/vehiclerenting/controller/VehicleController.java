@@ -1,6 +1,7 @@
 package dev.jeankarlo.vehiclerenting.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleSearchFilter;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.vehicleMedia.VehicleMediaResponseDTO;
@@ -127,6 +128,16 @@ public class VehicleController {
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(vehicleMediaService.getVehicleMedias(id));
+    }
+
+    @DeleteMapping("/{vehicleId}/images/{mediaId}")
+    @PreAuthorize("hasRole('PARTNER')")
+    public ResponseEntity<Void> deleteVehicleMedia(
+            @PathVariable Long vehicleId,
+            @PathVariable UUID mediaId,
+            @AuthenticationPrincipal Account account) {
+        vehicleMediaService.deleteMedia(vehicleId, mediaId, account.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/available")
