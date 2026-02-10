@@ -3,7 +3,6 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
-import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionImage.InspectionImageRespondeDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
@@ -12,18 +11,14 @@ import dev.jeankarlo.vehiclerenting.exception.BusinessException;
 import dev.jeankarlo.vehiclerenting.mapper.InspectionMapper;
 import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
-import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import dev.jeankarlo.vehiclerenting.service.InspectionService;
 import dev.jeankarlo.vehiclerenting.service.VehicleService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class InspectionServiceImpl implements InspectionService {
@@ -31,14 +26,12 @@ public class InspectionServiceImpl implements InspectionService {
     private final BookingService bookingService;
     private final VehicleService vehicleService;
     private final InspectionRepository inspectionRepository;
-    private final FileStorageService fileStorageService;
     private final InspectionMapper inspectionMapper;
 
-    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, FileStorageService fileStorageService,  InspectionMapper inspectionMapper) {
+    public InspectionServiceImpl(BookingService bookingService, VehicleService vehicleService, InspectionRepository inspectionRepository, InspectionMapper inspectionMapper) {
         this.bookingService = bookingService;
         this.vehicleService = vehicleService;
         this.inspectionRepository = inspectionRepository;
-        this.fileStorageService = fileStorageService;
         this.inspectionMapper = inspectionMapper;
     }
 
@@ -77,27 +70,6 @@ public class InspectionServiceImpl implements InspectionService {
         inspectionRepository.save(inspection);
 
         return inspectionMapper.toResponseDTO(inspection);
-    }
-
-
-    @Override
-    @Transactional
-    public InspectionImageRespondeDTO uploadInspectionImage(Long inspectionId, MultipartFile file, Long partnerId) {
-        Inspection inspection = getInspectionEntityById(inspectionId);
-
-        validatePartnerOwnership(partnerId, inspection);
-
-        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if (extension == null) extension = "jpg";
-
-        String key = "inspections/" + inspectionId + "/" + UUID.randomUUID() + "." + extension;
-
-        String url = "refactor";
-
-        return new InspectionImageRespondeDTO(
-                Integer.toUnsignedLong(1),
-                url
-        );
     }
 
     @Override
@@ -162,12 +134,14 @@ public class InspectionServiceImpl implements InspectionService {
                 .toList();
     }
 
-    private Inspection getInspectionEntityById(Long id) {
+    @Override
+    public Inspection getInspectionEntityById(Long id) {
         return inspectionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Inspeção não encontrada.", HttpStatus.NOT_FOUND));
     }
 
-    private void validatePartnerOwnership(Long partnerId, Inspection inspection) {
+    @Override
+    public void validatePartnerOwnership(Long partnerId, Inspection inspection) {
         Long ownerId = inspection.getBooking().getVehicle().getPartner().getId();
         if (!ownerId.equals(partnerId)) {
             throw new BusinessException("A inspeção não pertence ao parceiro autenticado.", HttpStatus.FORBIDDEN);

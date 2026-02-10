@@ -85,7 +85,6 @@ public class VehicleMediaServiceImpl implements VehicleMediaService {
         VehicleMedia vehicleMedia = vehicleMediaRepository.findByIdAndVehicle(vehicleMediaId, vehicle)
                 .orElseThrow(() -> new BusinessException("Mídia do veículo não encontrada.", HttpStatus.NOT_FOUND));
 
-        // VehicleMedia será deletado em cascata pelo banco (ON DELETE CASCADE)
         mediaAssetService.deleteFromStorageAndRepository(vehicleMedia.getMediaAsset().getId());
     }
 }

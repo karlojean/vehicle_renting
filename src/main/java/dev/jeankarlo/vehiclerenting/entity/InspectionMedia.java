@@ -23,4 +23,10 @@ public class InspectionMedia {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "inspection_id", nullable = false)
     private Inspection inspection;
+
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "media_id", nullable = false)
+    @MapsId
+    private MediaAsset mediaAsset;
 }
