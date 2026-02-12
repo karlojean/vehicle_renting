@@ -1,20 +1,28 @@
 package dev.jeankarlo.vehiclerenting.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -29,13 +37,11 @@ public class Booking {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
-    @JsonIgnore
     private Vehicle vehicle;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "renter_id", nullable = false)
-    @JsonIgnore
     private Account renter;
 
     @NotNull
@@ -60,7 +66,6 @@ public class Booking {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "booking")
-    @JsonIgnore
     private Set<Inspection> inspections = new LinkedHashSet<>();
 
 }
