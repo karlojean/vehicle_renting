@@ -5,6 +5,7 @@ import dev.jeankarlo.vehiclerenting.dto.booking.BookingResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.service.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +27,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingResponseDTO> booking(
-            @RequestBody BookingRequestDTO bookingRequestDTO,
+            @RequestBody @Valid BookingRequestDTO bookingRequestDTO,
             @AuthenticationPrincipal Account account
     ){
         Long accountId = account.getId();
