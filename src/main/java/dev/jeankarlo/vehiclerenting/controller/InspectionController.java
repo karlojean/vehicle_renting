@@ -1,21 +1,30 @@
 package dev.jeankarlo.vehiclerenting.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionResponseDTO;
-import dev.jeankarlo.vehiclerenting.dto.location.inspectionMedia.InspectionMediaResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionMedia.InspectionMediaResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.service.InspectionMediaService;
 import dev.jeankarlo.vehiclerenting.service.InspectionService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/inspections")
@@ -33,8 +42,7 @@ public class InspectionController {
     @PostMapping
     public ResponseEntity<InspectionResponseDTO> initInspection(
             @RequestBody @Valid InspectionInitDTO inspectionInitDTO,
-            @AuthenticationPrincipal Account account
-            ) {
+            @AuthenticationPrincipal Account account) {
         Long partnerId = account.getId();
         return ResponseEntity.ok(inspectionService.initInspection(inspectionInitDTO, partnerId));
     }
@@ -49,7 +57,7 @@ public class InspectionController {
     }
 
     @PostMapping("/{id}/medias")
-    public ResponseEntity<InspectionMediaResponseDTO> uploadInspectionImage(
+    public ResponseEntity<InspectionMediaResponseDTO> uploadInspectionMedia(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal Account account) {
@@ -58,15 +66,15 @@ public class InspectionController {
     }
 
     @GetMapping("/{id}/medias")
-    public ResponseEntity<List<InspectionMediaResponseDTO>> getInspectionImagesById(
+    public ResponseEntity<List<InspectionMediaResponseDTO>> getInspectionMediasById(
             @PathVariable Long id,
             @AuthenticationPrincipal Account account) {
         Long partnerId = account.getId();
-        return ResponseEntity.ok(inspectionMediaService.getMediasByInspectionId(id));
+        return ResponseEntity.ok(inspectionMediaService.getMediasByInspectionId(id, partnerId));
     }
 
     @DeleteMapping("/{id}/medias/{mediaId}")
-    public ResponseEntity<Void> deleteInspectionImage(
+    public ResponseEntity<Void> deleteInspectionMedia(
             @PathVariable Long id,
             @PathVariable UUID mediaId,
             @AuthenticationPrincipal Account account) {

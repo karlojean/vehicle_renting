@@ -1,9 +1,8 @@
 package dev.jeankarlo.vehiclerenting.mapper;
 
 import dev.jeankarlo.vehiclerenting.config.S3.BucketType;
-import dev.jeankarlo.vehiclerenting.dto.location.inspectionMedia.InspectionMediaResponseDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.inspectionMedia.InspectionMediaResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.InspectionMedia;
-import dev.jeankarlo.vehiclerenting.entity.VehicleMedia;
 import dev.jeankarlo.vehiclerenting.service.FileStorageService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;

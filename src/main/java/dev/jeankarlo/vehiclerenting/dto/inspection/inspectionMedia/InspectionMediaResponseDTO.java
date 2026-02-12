@@ -1,4 +1,4 @@
-package dev.jeankarlo.vehiclerenting.dto.location.inspectionMedia;
+package dev.jeankarlo.vehiclerenting.dto.inspection.inspectionMedia;
 
 import java.util.UUID;
 
