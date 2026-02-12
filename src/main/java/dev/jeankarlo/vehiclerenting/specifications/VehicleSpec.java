@@ -1,15 +1,17 @@
 package dev.jeankarlo.vehiclerenting.specifications;
 
+import java.time.LocalDate;
+
+import org.springframework.data.jpa.domain.Specification;
+
 import dev.jeankarlo.vehiclerenting.entity.Booking;
 import dev.jeankarlo.vehiclerenting.entity.Location;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
+import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import org.springframework.data.jpa.domain.Specification;
-
-import java.time.LocalDate;
 
 public class VehicleSpec {
     public static Specification<Vehicle> hasCity(String city) {
@@ -28,16 +30,16 @@ public class VehicleSpec {
 
             Predicate vehicleMatch = criteriaBuilder.equal(bookingRoot.get("vehicle"), root);
 
+            Predicate notCancelled = criteriaBuilder.notEqual(bookingRoot.get("status"), BookingStatus.CANCELLED);
+
             Predicate startOverlap = criteriaBuilder.lessThan(bookingRoot.get("startDate"), endDate);
             Predicate endOverlap = criteriaBuilder.greaterThan(bookingRoot.get("endDate"), startDate);
 
-            subquery.select(bookingRoot).where(criteriaBuilder.and(vehicleMatch, startOverlap, endOverlap));
+            subquery.select(bookingRoot)
+                    .where(criteriaBuilder.and(vehicleMatch, notCancelled, startOverlap, endOverlap));
 
             return criteriaBuilder.not(criteriaBuilder.exists(subquery));
         };
     }
-
-
-
 
 }
