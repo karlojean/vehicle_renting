@@ -10,7 +10,7 @@ import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleResponseDTO;
 import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 
-@Mapper(componentModel = "spring", uses = {LocationMapper.class})
+@Mapper(componentModel = "spring", uses = { LocationMapper.class, VehicleMediaMapper.class })
 public interface VehicleMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -20,6 +20,7 @@ public interface VehicleMapper {
     @Mapping(target = "createdAt", ignore = true)
     Vehicle toEntity(VehicleRequestDTO dto);
 
+    @Mapping(source = "mediaAssets", target = "medias")
     VehicleResponseDTO toResponseDTO(Vehicle vehicle);
 
     @BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
