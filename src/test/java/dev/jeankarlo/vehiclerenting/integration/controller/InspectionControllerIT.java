@@ -1,6 +1,6 @@
-package dev.jeankarlo.vehiclerenting.controller;
+package dev.jeankarlo.vehiclerenting.integration.controller;
 
-import dev.jeankarlo.vehiclerenting.BaseAuthenticatedTest;
+import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
 import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
 import dev.jeankarlo.vehiclerenting.entity.*;

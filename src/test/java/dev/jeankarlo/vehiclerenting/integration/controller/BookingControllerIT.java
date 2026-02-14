@@ -1,6 +1,6 @@
-package dev.jeankarlo.vehiclerenting.controller;
+package dev.jeankarlo.vehiclerenting.integration.controller;
 
-import dev.jeankarlo.vehiclerenting.BaseAuthenticatedTest;
+import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
 import dev.jeankarlo.vehiclerenting.dto.booking.BookingRequestDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
@@ -12,7 +12,6 @@ import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
 import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
 import dev.jeankarlo.vehiclerenting.repository.LocationRepository;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

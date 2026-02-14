@@ -1,13 +1,11 @@
-package dev.jeankarlo.vehiclerenting;
+package dev.jeankarlo.vehiclerenting.integration;
 
 import dev.jeankarlo.vehiclerenting.dto.auth.LoginRequestDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.enums.AccountRole;
 import dev.jeankarlo.vehiclerenting.repository.AccountRepository;
 import io.restassured.http.ContentType;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 

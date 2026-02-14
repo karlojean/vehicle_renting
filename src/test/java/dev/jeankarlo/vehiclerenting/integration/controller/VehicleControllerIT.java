@@ -1,7 +1,7 @@
-package dev.jeankarlo.vehiclerenting.controller;
+package dev.jeankarlo.vehiclerenting.integration.controller;
 
 
-import dev.jeankarlo.vehiclerenting.BaseAuthenticatedTest;
+import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;

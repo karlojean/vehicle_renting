@@ -1,6 +1,6 @@
-package dev.jeankarlo.vehiclerenting.controller;
+package dev.jeankarlo.vehiclerenting.integration.controller;
 
-import dev.jeankarlo.vehiclerenting.BaseIntegrationTest;
+import dev.jeankarlo.vehiclerenting.integration.BaseIntegrationTest;
 import dev.jeankarlo.vehiclerenting.dto.auth.LoginRequestDTO;
 import dev.jeankarlo.vehiclerenting.dto.auth.RegisterRequestDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
@@ -37,7 +37,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(
                 "JohnDoe",
                 "johndoe@mail.com",
-                "111",
+                "111111",
                 AccountRole.PARTNER
         );
 
@@ -58,7 +58,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(
                 "JohnDoe",
                 "johndoe@",
-                "111",
+                "111111",
                 AccountRole.PARTNER
         );
 
@@ -86,7 +86,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(
                 "JohnDoe12",
                 "johndoe@mail.com",
-                "111",
+                "111111",
                 AccountRole.PARTNER
         );
 
@@ -115,7 +115,7 @@ public class AuthControllerIT extends BaseIntegrationTest {
         RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(
                 "JohnDoe",
                 "johndoe22@mail.com",
-                "111",
+                "1111111",
                 AccountRole.PARTNER
         );
 

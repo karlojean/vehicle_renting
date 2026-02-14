@@ -20,7 +20,7 @@ CREATE TABLE location
     longitude    DECIMAL(9, 6),
     partner_id   BIGINT       NOT NULL,
 
-    CONSTRAINT fk_location_partner FOREIGN KEY (partner_id) REFERENCES account (id)
+    CONSTRAINT fk_location_partner FOREIGN KEY (partner_id) REFERENCES account (id) ON DELETE CASCADE
 );
 
 CREATE TABLE vehicle
@@ -41,7 +41,7 @@ CREATE TABLE vehicle
     partner_id          BIGINT      NOT NULL,
     location_id         BIGINT      NOT NULL,
 
-    CONSTRAINT fk_partner FOREIGN KEY (partner_id) REFERENCES account (id),
+    CONSTRAINT fk_partner FOREIGN KEY (partner_id) REFERENCES account (id) ON DELETE CASCADE,
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location (id)
 );
 
@@ -56,8 +56,8 @@ CREATE TABLE booking
     status            VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'ACTIVE', 'COMPLETED')),
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
 
-    CONSTRAINT fk_booking_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id),
-    CONSTRAINT fk_booking_renter FOREIGN KEY (renter_id) REFERENCES account (id)
+    CONSTRAINT fk_booking_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE,
+    CONSTRAINT fk_booking_renter FOREIGN KEY (renter_id) REFERENCES account (id) ON DELETE CASCADE
 );
 
 CREATE TABLE inspection
@@ -77,5 +77,5 @@ CREATE TABLE inspection
     has_spare_tire BOOLEAN DEFAULT TRUE,
     has_documents BOOLEAN DEFAULT TRUE,
 
-    CONSTRAINT fk_inspection_booking FOREIGN KEY (booking_id) REFERENCES booking (id)
+    CONSTRAINT fk_inspection_booking FOREIGN KEY (booking_id) REFERENCES booking (id) ON DELETE CASCADE
 );
