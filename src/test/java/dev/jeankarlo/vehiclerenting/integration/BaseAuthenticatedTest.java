@@ -28,8 +28,8 @@ public class BaseAuthenticatedTest extends BaseIntegrationTest {
         return loginAndGetToken(account.getEmail());
     }
 
-    protected String createAndLoginAsCustomer() {
-        Account account = createCustomerAccount();
+    protected String createAndLoginAsRenter() {
+        Account account = createRenterAccount();
         return loginAndGetToken(account.getEmail());
     }
 
@@ -37,7 +37,7 @@ public class BaseAuthenticatedTest extends BaseIntegrationTest {
         return createAccountWithRole(AccountRole.PARTNER);
     }
 
-    private Account createCustomerAccount() {
+    private Account createRenterAccount() {
         return createAccountWithRole(AccountRole.RENTER);
     }
 

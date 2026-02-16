@@ -91,8 +91,8 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
 
     @Test
     @DisplayName("Should fail to create vehicle when user is customer")
-    void shouldFailToCreateVehicleWhenUserIsCustomer() {
-        String token = createAndLoginAsCustomer();
+    void shouldFailToCreateVehicleWhenUserIsRenter() {
+        String token = createAndLoginAsRenter();
         Account owner = getCurrentAccount(token);
 
         Location location = createAndSaveLocation(owner);
@@ -332,7 +332,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
     @Test
     @DisplayName("Should return available vehicles when filters match")
     void shouldReturnAvailableVehiclesWhenFiltersMatch() {
-        String token = createAndLoginAsCustomer();
+        String token = createAndLoginAsRenter();
         Account account = getCurrentAccount(token);
         Location location = createAndSaveLocation(account);
         Vehicle vehicle = createVehicle(location, account);
@@ -358,7 +358,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
     @Test
     @DisplayName("Should not return vehicle already rented in the requested period")
     void shouldNotReturnVehicleAlreadyRentedInTheRequestedPeriod() {
-        String token = createAndLoginAsCustomer();
+        String token = createAndLoginAsRenter();
         Account account = getCurrentAccount(token);
 
         String partnerToken = createAndLoginAsRentingPartner();
@@ -370,11 +370,11 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(3);
 
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomer = getCurrentAccount(foreignCustomerToken);
+        String foreignRenterToken = createAndLoginAsRenter();
+        Account foreignRenter = getCurrentAccount(foreignRenterToken);
         Booking booking = new Booking();
         booking.setVehicle(vehicle);
-        booking.setRenter(foreignCustomer);
+        booking.setRenter(foreignRenter);
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
         booking.setStatus(BookingStatus.PENDING);

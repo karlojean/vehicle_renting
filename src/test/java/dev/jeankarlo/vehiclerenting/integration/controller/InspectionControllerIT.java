@@ -39,7 +39,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     @DisplayName("Should init pick-up inspection when booking is confirmed")
     public void shouldInitPickUpInspectionWhenBookingIsConfirmed() {
         String partnerToken = createAndLoginAsRentingPartner();
-        String renterToken = createAndLoginAsCustomer();
+        String renterToken = createAndLoginAsRenter();
         Account partnerAccount = getCurrentAccount(partnerToken);
         Account renterAccount = getCurrentAccount(renterToken);
 
@@ -68,7 +68,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     @DisplayName("Should not init pick-up inspection when booking is not confirmed")
     public void shouldNotInitPickUpInspectionWhenBookingIsNotConfirmed() {
         String partnerToken = createAndLoginAsRentingPartner();
-        String renterToken = createAndLoginAsCustomer();
+        String renterToken = createAndLoginAsRenter();
         Account partnerAccount = getCurrentAccount(partnerToken);
         Account renterAccount = getCurrentAccount(renterToken);
 
@@ -95,7 +95,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     @DisplayName("Should init drop-off inspection when booking is active")
     public void shouldInitDropOffInspectionWhenBookingIsActive() {
         String partnerToken = createAndLoginAsRentingPartner();
-        String renterToken = createAndLoginAsCustomer();
+        String renterToken = createAndLoginAsRenter();
         Account partnerAccount = getCurrentAccount(partnerToken);
         Account renterAccount = getCurrentAccount(renterToken);
 
@@ -124,7 +124,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     @DisplayName("Should not init drop-off inspection when booking is not active")
     public void shouldNotInitDropOffInspectionWhenBookingIsNotActive() {
         String partnerToken = createAndLoginAsRentingPartner();
-        String renterToken = createAndLoginAsCustomer();
+        String renterToken = createAndLoginAsRenter();
         Account partnerAccount = getCurrentAccount(partnerToken);
         Account renterAccount = getCurrentAccount(renterToken);
 
@@ -152,7 +152,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
     public void shouldFailWhenPartnerTriesToInitInspectionForBookingTheyDontOwn() {
         String partnerToken = createAndLoginAsRentingPartner();
         String anotherPartnerToken = createAndLoginAsRentingPartner();
-        String renterToken = createAndLoginAsCustomer();
+        String renterToken = createAndLoginAsRenter();
         Account anotherPartnerAccount = getCurrentAccount(anotherPartnerToken);
         Account renterAccount = getCurrentAccount(renterToken);
 
@@ -179,8 +179,8 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
 
     @Test
     @DisplayName("Should fail when customer tries to init inspection")
-    public void shouldFailWhenCustomerTriesToInitInspection() {
-        String customerToken = createAndLoginAsCustomer();
+    public void shouldFailWhenRenterTriesToInitInspection() {
+        String customerToken = createAndLoginAsRenter();
         String partnerToken = createAndLoginAsRentingPartner();
         Account partnerAccount = getCurrentAccount(partnerToken);
         Account customerAccount = getCurrentAccount(customerToken);
@@ -218,7 +218,7 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
         LocalDate startDate = LocalDate.now().plusDays(1);
         LocalDate endDate = startDate.plusDays(3);
 
-        String accountToken = createAndLoginAsCustomer();
+        String accountToken = createAndLoginAsRenter();
         Account renterAccount = getCurrentAccount(accountToken);
 
         Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);

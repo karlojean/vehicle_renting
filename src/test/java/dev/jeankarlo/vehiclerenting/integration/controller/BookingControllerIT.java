@@ -41,7 +41,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
         BookingRequestDTO bookingRequestDTO = new BookingRequestDTO(
                 vehicle.getId(),
                 LocalDate.now().plusDays(4),
@@ -66,15 +66,15 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Account partnerAccount = getCurrentAccount(partnerToken);
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomerAccount = getCurrentAccount(foreignCustomerToken);
+        String foreignRenterToken = createAndLoginAsRenter();
+        Account foreignRenterAccount = getCurrentAccount(foreignRenterToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(5);
 
-        createBooking(vehicle, foreignCustomerAccount, startDate, endDate);
+        createBooking(vehicle, foreignRenterAccount, startDate, endDate);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
 
         given()
                 .header("Authorization", "Bearer " + customerToken)
@@ -94,7 +94,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
     @Test
     @DisplayName("Should fail to create booking when vehicle does not exist")
     void shouldFailToCreateBookingWhenVehicleDoesNotExist() {
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
 
         given()
                 .header("Authorization", "Bearer " + customerToken)
@@ -118,7 +118,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
 
         given()
                 .header("Authorization", "Bearer " + customerToken)
@@ -142,7 +142,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
         LocalDate date = LocalDate.now().plusDays(5);
 
         given()
@@ -167,7 +167,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
         Account customerAccount = getCurrentAccount(customerToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
@@ -198,7 +198,7 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String customerToken = createAndLoginAsCustomer();
+        String customerToken = createAndLoginAsRenter();
         Account customerAccount = getCurrentAccount(customerToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
@@ -229,13 +229,13 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomerAccount = getCurrentAccount(foreignCustomerToken);
+        String foreignRenterToken = createAndLoginAsRenter();
+        Account foreignRenterAccount = getCurrentAccount(foreignRenterToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(5);
 
-        Booking booking = createBooking(vehicle, foreignCustomerAccount, startDate, endDate);
+        Booking booking = createBooking(vehicle, foreignRenterAccount, startDate, endDate);
 
         String anotherPartnerToken = createAndLoginAsRentingPartner();
 
@@ -255,13 +255,13 @@ public class BookingControllerIT extends BaseAuthenticatedTest {
         Location location = createAndSaveLocation(partnerAccount);
         Vehicle vehicle = createVehicle(location, partnerAccount);
 
-        String foreignCustomerToken = createAndLoginAsCustomer();
-        Account foreignCustomerAccount = getCurrentAccount(foreignCustomerToken);
+        String foreignRenterToken = createAndLoginAsRenter();
+        Account foreignRenterAccount = getCurrentAccount(foreignRenterToken);
 
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(5);
 
-        Booking booking = createBooking(vehicle, foreignCustomerAccount, startDate, endDate);
+        Booking booking = createBooking(vehicle, foreignRenterAccount, startDate, endDate);
 
         String anotherPartnerToken = createAndLoginAsRentingPartner();
 
