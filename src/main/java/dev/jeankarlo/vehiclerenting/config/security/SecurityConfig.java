@@ -1,5 +1,7 @@
 package dev.jeankarlo.vehiclerenting.config.security;
 
+import dev.jeankarlo.vehiclerenting.dto.error.ApiError;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
@@ -64,7 +67,26 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/vehicles/available").permitAll()                        .requestMatchers("/auth/logout").authenticated()
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            ApiError apiError = ApiError.builder()
+                                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                                    .error("Unauthorized")
+                                    .message("E necessário autenticação para acessar este recurso")
+                                    .path(request.getRequestURI())
+                                    .build();
+
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                            ObjectMapper mapper = new ObjectMapper();
+
+                            String jsonResponse = mapper.writeValueAsString(apiError);
+                            response.getWriter().write(jsonResponse);
+                        })
+                )
+        ;
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
