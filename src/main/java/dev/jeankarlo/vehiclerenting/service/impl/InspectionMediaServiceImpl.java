@@ -3,6 +3,7 @@ package dev.jeankarlo.vehiclerenting.service.impl;
 import java.util.List;
 import java.util.UUID;
 
+import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +53,10 @@ public class InspectionMediaServiceImpl implements InspectionMediaService {
         }
 
         Inspection inspection = inspectionService.getInspectionEntityById(inspectionId);
+
+        if(inspection.getStatus() != InspectionStatus.PENDING) {
+            throw new BusinessException("Mídias só podem ser adicionadas a inspeções com status PENDING.", HttpStatus.BAD_REQUEST);
+        }
 
         if (inspectionMediaRepository.countByInspection(inspection) >= 20) {
             throw new BusinessException("Número máximo de mídias atingido para esta inspeção.", HttpStatus.BAD_REQUEST);

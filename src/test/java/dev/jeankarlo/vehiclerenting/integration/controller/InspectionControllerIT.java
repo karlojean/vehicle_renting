@@ -1,28 +1,39 @@
 package dev.jeankarlo.vehiclerenting.integration.controller;
 
-import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
-import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
-import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
-import dev.jeankarlo.vehiclerenting.entity.*;
-import dev.jeankarlo.vehiclerenting.entity.enums.*;
-import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
-import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
-import dev.jeankarlo.vehiclerenting.repository.LocationRepository;
-import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionInitDTO;
+import dev.jeankarlo.vehiclerenting.dto.inspection.InspectionPatchDTO;
+import dev.jeankarlo.vehiclerenting.entity.Account;
+import dev.jeankarlo.vehiclerenting.entity.Booking;
+import dev.jeankarlo.vehiclerenting.entity.Inspection;
+import dev.jeankarlo.vehiclerenting.entity.Location;
+import dev.jeankarlo.vehiclerenting.entity.Vehicle;
+import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
+import dev.jeankarlo.vehiclerenting.entity.enums.InspectionStatus;
+import dev.jeankarlo.vehiclerenting.entity.enums.InspectionType;
+import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
+import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
+import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
+import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
+import dev.jeankarlo.vehiclerenting.repository.InspectionRepository;
+import dev.jeankarlo.vehiclerenting.repository.LocationRepository;
+import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-
-
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class InspectionControllerIT extends BaseAuthenticatedTest {
 
@@ -206,7 +217,6 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
                 .statusCode(403);
     }
 
-
     @Test
     @DisplayName("Should update inspection successfully")
     void shouldUpdateInspectionSuccessfully() {
@@ -239,16 +249,15 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null);
 
         given()
                 .header("Authorization", "Bearer " + partnerToken)
                 .contentType("application/json")
-        .body(inspectionPatchDTO)
+                .body(inspectionPatchDTO)
                 .when()
                 .patch("/inspections/" + inspection.getId())
-        .then()
+                .then()
                 .statusCode(200)
                 .body("odometerReading", equalTo(15000))
                 .body("fuelLevel", equalTo(80))
@@ -257,6 +266,430 @@ public class InspectionControllerIT extends BaseAuthenticatedTest {
                 .body("hasSmokeSmell", nullValue())
                 .body("hasSpareTire", nullValue())
                 .body("hasDocuments", nullValue());
+    }
+
+    @Test
+    @DisplayName("Should complete inspection successfully")
+    void shouldCompleteInspectionSuccessfully() {
+
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/complete")
+                .then()
+                .statusCode(200)
+                .body("status", equalTo("COMPLETED"));
+    }
+
+    @Test
+    @DisplayName("Should fail to complete inspection when not pending")
+    void shouldFailCompleteInspectionWhenNotPending() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/complete")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Should fail to complete inspection when not owned")
+    void shouldFailCompleteInspectionWhenNotOwned() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        String anotherPartnerToken = createAndLoginAsRentingPartner();
+        Account anotherPartnerAccount = getCurrentAccount(anotherPartnerToken);
+
+        Location location = createAndSaveLocation(anotherPartnerAccount);
+        Vehicle vehicle = createVehicle(location, anotherPartnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/complete")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("Should cancel inspection successfully")
+    void shouldCancelInspectionSuccessfully() {
+
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/cancel")
+                .then()
+                .statusCode(200)
+                .body("status", equalTo("CANCELLED"));
+    }
+
+    @Test
+    @DisplayName("Should fail to cancel inspection when not pending")
+    void shouldFailToCancelInspectionWhenNotPending() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/cancel")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Should fail to cancel inspection when not owned")
+    void shouldFailToCancelInspectionWhenNotOwned() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        String anotherPartnerToken = createAndLoginAsRentingPartner();
+        Account anotherPartnerAccount = getCurrentAccount(anotherPartnerToken);
+
+        Location location = createAndSaveLocation(anotherPartnerAccount);
+        Vehicle vehicle = createVehicle(location, anotherPartnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .when()
+                .patch("/inspections/" + inspection.getId() + "/cancel")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("Should upload media successfully")
+    void shouldUploadMediaSuccessfully() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/inspections/" + inspection.getId() + "/medias")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("Should fail to upload media when not owned")
+    void shouldFailToUploadMediaWhenNotOwned() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        String anotherPartnerToken = createAndLoginAsRentingPartner();
+        Account anotherPartnerAccount = getCurrentAccount(anotherPartnerToken);
+
+        Location location = createAndSaveLocation(anotherPartnerAccount);
+        Vehicle vehicle = createVehicle(location, anotherPartnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/inspections/" + inspection.getId() + "/medias")
+                .then()
+                .statusCode(403);
+
+    }
+
+    @Test
+    @DisplayName("Should fail to upload media when inspection is not pending")
+    void shouldFailToUploadMediaWhenInspectionNotPending() {
+
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        inspectionRepository.save(inspection);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/inspections/" + inspection.getId() + "/medias")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Should fail to upload more than 20 images for the same vehicle")
+    void shouldFailToUploadMoreThan20ImagesForSameVehicle() {
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        for (int i = 0; i < 20; i++) {
+            given()
+                    .header("Authorization", "Bearer " + partnerToken)
+                    .multiPart("file", imageFile, "image/jpeg")
+                    .when()
+                    .post("/inspections/" + inspection.getId() + "/medias")
+                    .then()
+                    .statusCode(200);
+        }
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/inspections/" + inspection.getId() + "/medias")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Should fail to upload unsupported media type")
+    void shouldFailToUploadUnsupportedMediaType() {
+
+        String partnerToken = createAndLoginAsRentingPartner();
+        Account partnerAccount = getCurrentAccount(partnerToken);
+
+        Location location = createAndSaveLocation(partnerAccount);
+        Vehicle vehicle = createVehicle(location, partnerAccount);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(3);
+
+        String accountToken = createAndLoginAsRenter();
+        Account renterAccount = getCurrentAccount(accountToken);
+
+        Booking booking = createBooking(vehicle, renterAccount, startDate, endDate);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        Inspection inspection = new Inspection();
+        inspection.setBooking(booking);
+        inspection.setType(InspectionType.PICK_UP);
+        inspection.setInspectionDate(Instant.now());
+        inspection.setStatus(InspectionStatus.PENDING);
+        inspectionRepository.save(inspection);
+
+        File unsupportedFile = new File(
+                getClass().getClassLoader().getResource("test-medias/unsupported-file.txt").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + partnerToken)
+                .multiPart("file", unsupportedFile, "text/plain")
+                .when()
+                .post("/inspections/" + inspection.getId() + "/medias")
+                .then()
+                .statusCode(415);
+
     }
 
     private Location createAndSaveLocation(Account partner) {
