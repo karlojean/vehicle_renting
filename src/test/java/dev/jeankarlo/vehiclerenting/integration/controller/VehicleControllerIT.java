@@ -1,7 +1,31 @@
 package dev.jeankarlo.vehiclerenting.integration.controller;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Random;
+import java.util.UUID;
 
-import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
+
 import dev.jeankarlo.vehiclerenting.dto.vehicle.VehicleRequestDTO;
 import dev.jeankarlo.vehiclerenting.entity.Account;
 import dev.jeankarlo.vehiclerenting.entity.Booking;
@@ -10,32 +34,20 @@ import dev.jeankarlo.vehiclerenting.entity.Vehicle;
 import dev.jeankarlo.vehiclerenting.entity.enums.BookingStatus;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleFuelType;
 import dev.jeankarlo.vehiclerenting.entity.enums.VehicleType;
+import dev.jeankarlo.vehiclerenting.integration.BaseAuthenticatedTest;
 import dev.jeankarlo.vehiclerenting.repository.AccountRepository;
 import dev.jeankarlo.vehiclerenting.repository.BookingRepository;
 import dev.jeankarlo.vehiclerenting.repository.LocationRepository;
 import dev.jeankarlo.vehiclerenting.repository.VehicleRepository;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Random;
-import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+
+import io.restassured.http.ContentType;
 
 public class VehicleControllerIT extends BaseAuthenticatedTest {
 
     @Autowired
     private AccountRepository accountRepository;
-
 
     @LocalServerPort
     private int port;
@@ -74,16 +86,15 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
                 "Blue",
                 5000L,
                 "Carro confortável e econômico, perfeito para viagens.",
-                location.getId()
-        );
+                location.getId());
 
         given()
                 .contentType(ContentType.JSON)
                 .body(vehicleRequestDTO)
                 .header("Authorization", "Bearer " + token)
-            .when()
+                .when()
                 .post("/vehicles")
-            .then()
+                .then()
                 .statusCode(201)
                 .body("id", notNullValue());
 
@@ -107,8 +118,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
                 "Blue",
                 5000L,
                 "Carro confortável e econômico, perfeito para viagens.",
-                location.getId()
-        );
+                location.getId());
 
         given()
                 .contentType(ContentType.JSON)
@@ -135,8 +145,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
                 "",
                 null,
                 "",
-                null
-        );
+                null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -148,8 +157,7 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
                 .statusCode(422)
                 .body("fieldMessages.fieldName", containsInAnyOrder("brand", "model", "fuelType", "vehicleType",
                         "yearManufactured", "licensePlate", "pricePerDayCents", "description", "locationId"))
-                .body("fieldMessages", hasSize(9))
-            ;
+                .body("fieldMessages", hasSize(9));
     }
 
     @Test
@@ -164,13 +172,13 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         Vehicle vehicle2 = createVehicle(location, account);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .get("/vehicles")
-        .then()
-            .statusCode(200)
-            .body("", hasSize(2));
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/vehicles")
+                .then()
+                .statusCode(200)
+                .body("", hasSize(2));
     }
 
     @Test
@@ -189,14 +197,14 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         Vehicle vehicle2 = createVehicle(location, account);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .get("/vehicles")
-        .then()
-            .statusCode(200)
-            .body("", hasSize(2))
-            .body("id", not(hasItem(foreignPartnerVehicle.getId().intValue())));
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/vehicles")
+                .then()
+                .statusCode(200)
+                .body("", hasSize(2))
+                .body("id", not(hasItem(foreignPartnerVehicle.getId().intValue())));
 
     }
 
@@ -209,13 +217,13 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         Vehicle vehicle = createVehicle(location, account);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .get("/vehicles/{id}", vehicle.getId())
-        .then()
-            .statusCode(200)
-            .body("id", equalTo(vehicle.getId().intValue()));
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/vehicles/{id}", vehicle.getId())
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(vehicle.getId().intValue()));
     }
 
     @Test
@@ -229,12 +237,12 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         String token = createAndLoginAsRentingPartner();
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .get("/vehicles/{id}", foreignPartnerVehicle.getId())
-        .then()
-            .statusCode(404);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/vehicles/{id}", foreignPartnerVehicle.getId())
+                .then()
+                .statusCode(404);
     }
 
     @Test
@@ -246,12 +254,12 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         Vehicle vehicle = createVehicle(location, account);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .delete("/vehicles/{id}", vehicle.getId())
-        .then()
-            .statusCode(204);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete("/vehicles/{id}", vehicle.getId())
+                .then()
+                .statusCode(204);
     }
 
     @Test
@@ -265,12 +273,12 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         String token = createAndLoginAsRentingPartner();
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .delete("/vehicles/{id}", foreignPartnerVehicle.getId())
-        .then()
-            .statusCode(404);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete("/vehicles/{id}", foreignPartnerVehicle.getId())
+                .then()
+                .statusCode(404);
     }
 
     @Test
@@ -279,12 +287,12 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         String token = createAndLoginAsRentingPartner();
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .delete("/vehicles/{id}", 9999)
-        .then()
-            .statusCode(404);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete("/vehicles/{id}", 9999)
+                .then()
+                .statusCode(404);
     }
 
     @Test
@@ -296,12 +304,12 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         Vehicle vehicle = createVehicle(location, account);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .patch("/vehicles/{id}/deactivate", vehicle.getId())
-        .then()
-            .statusCode(204);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/vehicles/{id}/deactivate", vehicle.getId())
+                .then()
+                .statusCode(204);
 
         Vehicle afterVehicle = vehicleRepository.findById(vehicle.getId()).orElseThrow();
         assertFalse(afterVehicle.getIsActive());
@@ -318,15 +326,15 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         vehicleRepository.save(vehicle);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-        .when()
-            .patch("/vehicles/{id}/activate", vehicle.getId())
-        .then()
-            .statusCode(204);
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .patch("/vehicles/{id}/activate", vehicle.getId())
+                .then()
+                .statusCode(204);
 
         Vehicle afterVehicle = vehicleRepository.findById(vehicle.getId()).orElseThrow();
-        assert(afterVehicle.getIsActive());
+        assert (afterVehicle.getIsActive());
     }
 
     @Test
@@ -340,19 +348,18 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         LocalDate startDate = LocalDate.now().plusDays(5);
         LocalDate endDate = startDate.plusDays(3);
 
-
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-            .queryParam("city", location.getCity())
-            .queryParam("startDate", startDate.toString())
-            .queryParam("endDate", endDate.toString())
-        .when()
-            .get("/vehicles/available")
-        .then()
-            .statusCode(200)
-            .body("", hasSize(1))
-            .body("id", hasItem(vehicle.getId().intValue()));
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .queryParam("city", location.getCity())
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .when()
+                .get("/vehicles/available")
+                .then()
+                .statusCode(200)
+                .body("", hasSize(1))
+                .body("id", hasItem(vehicle.getId().intValue()));
     }
 
     @Test
@@ -383,16 +390,244 @@ public class VehicleControllerIT extends BaseAuthenticatedTest {
         bookingRepository.save(booking);
 
         given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer "  + token)
-            .queryParam("city", location.getCity())
-            .queryParam("startDate", startDate.toString())
-            .queryParam("endDate", endDate.minusDays(1).toString())
-        .when()
-            .get("/vehicles/available")
-        .then()
-            .statusCode(200)
-            .body("", hasSize(0));
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .queryParam("city", location.getCity())
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.minusDays(1).toString())
+                .when()
+                .get("/vehicles/available")
+                .then()
+                .statusCode(200)
+                .body("", hasSize(0));
+    }
+
+    @Test
+    @DisplayName("Should partially update vehicle successfully")
+    void shouldPartiallyUpdateVehicleSuccessfully() {
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body("""
+                            {
+                                "color": "Red",
+                                "pricePerDayCents": 6000
+                            }
+                        """)
+                .when()
+                .patch("/vehicles/{id}", vehicle.getId())
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(vehicle.getId().intValue()));
+    }
+
+    @Test
+    @DisplayName("Should fail to partially update vehicle when user is not owner")
+    void shouldFailToPartiallyUpdateVehicleWhenUserIsNotOwner() {
+        String foreignPartnerToken = createAndLoginAsRentingPartner();
+        Account foreignPartner = getCurrentAccount(foreignPartnerToken);
+        Location foreignPartnerLocation = createAndSaveLocation(foreignPartner);
+        Vehicle foreignPartnerVehicle = createVehicle(foreignPartnerLocation, foreignPartner);
+
+        String token = createAndLoginAsRentingPartner();
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body("""
+                            {
+                                "color": "Red",
+                                "pricePerDayCents": 6000
+                            }
+                        """)
+                .when()
+                .patch("/vehicles/{id}", foreignPartnerVehicle.getId())
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("Should upload vehicle media successfully")
+    void shouldUploadVehicleMediaSuccessfully() {
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(200)
+                .body("id", notNullValue())
+                .body("originalFilename", equalTo("car-image.jpg"))
+                .body("contentType", equalTo("image/jpeg"))
+                .body("url", notNullValue());
+    }
+
+    @Test
+    @DisplayName("Should not upload vehicle media when user is not owner")
+    void shouldNotUploadVehicleMediaWhenUserIsNotOwner() {
+        String foreignPartnerToken = createAndLoginAsRentingPartner();
+        Account foreignPartner = getCurrentAccount(foreignPartnerToken);
+        Location foreignPartnerLocation = createAndSaveLocation(foreignPartner);
+        Vehicle foreignPartnerVehicle = createVehicle(foreignPartnerLocation, foreignPartner);
+
+        String token = createAndLoginAsRentingPartner();
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/vehicles/{id}/images", foreignPartnerVehicle.getId())
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("Should get vehicle medias successfully")
+    void shouldGetVehicleMediasSuccessfully() {
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(200);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(200)
+                .body("", hasSize(1))
+                .body("[0].originalFilename", equalTo("car-image.jpg"))
+                .body("[0].contentType", equalTo("image/jpeg"))
+                .body("[0].url", notNullValue());
+    }
+
+    @Test
+    @DisplayName("Should remove vehicle media successfully")
+    void shouldRemoveMediaSuccessfully() {
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        String mediaId = given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete("/vehicles/{vehicleId}/images/{mediaId}", vehicle.getId(), mediaId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    @DisplayName("Should fail to upload media with unsupported file type")
+    void shouldFailToUploadMediaWithUnsupportedFileType() {
+
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        File textFile = new File(
+                getClass().getClassLoader().getResource("test-medias/unsupported-file.txt").getFile());
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", textFile, "text/plain")
+                .when()
+                .post("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(415);
+
+    }
+
+    @Test
+    @DisplayName("Should fail to upload more than 10 images for the same vehicle")
+    void shouldFailToUploadMoreThan10ImagesForTheSameVehicle() {
+        String token = createAndLoginAsRentingPartner();
+        Account account = getCurrentAccount(token);
+        Location location = createAndSaveLocation(account);
+        Vehicle vehicle = createVehicle(location, account);
+
+        when(s3FileStorageService.uploadFile(anyString(), any(), anyString(), anyLong(), any()))
+                .thenReturn("fake-path/car-image.jpg");
+        when(s3FileStorageService.getPublicUrl(anyString(), any()))
+                .thenReturn("https://fake-bucket.s3.amazonaws.com/car-image.jpg");
+
+        File imageFile = new File(
+                getClass().getClassLoader().getResource("test-medias/car-image.jpg").getFile());
+
+        for (int i = 0; i < 10; i++) {
+            given()
+                    .header("Authorization", "Bearer " + token)
+                    .multiPart("file", imageFile, "image/jpeg")
+                    .when()
+                    .post("/vehicles/{id}/images", vehicle.getId())
+                    .then()
+                    .statusCode(200);
+        }
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .multiPart("file", imageFile, "image/jpeg")
+                .when()
+                .post("/vehicles/{id}/images", vehicle.getId())
+                .then()
+                .statusCode(400);
+
     }
 
 
